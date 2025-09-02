@@ -88,6 +88,7 @@ def main():
                     pyautogui.sleep(1)
                     PlayerCtl.leftmouse(1)
                 if jinlema(yugan):
+                    last_outdate_counter += 1
                     start_time = datetime.now()
                     print("🐟 仍旧在钓鱼一切正常")
                     #检查是否还在钓鱼界面,如果还在就不管
@@ -99,7 +100,6 @@ def main():
                     else:
                         print("❌ 超时且不在钓鱼界面，也没有鱼上钩，重新启动流程")
                     status = 0
-                    last_outdate_counter += 1
                     start_time = datetime.now()
 
                 
