@@ -8,7 +8,7 @@ import numpy as np
 from fish.modules.utils import (find_game_window, pyautogui2opencv, switch_to_window_by_title ,
                                  debug_screenshot_data , area_cac)
 from fish.modules.fishing_logic import (
-    PreciseMouseClicker, youganma, jinlema, shanggoulema, 
+    PreciseMouseClicker, youganma, jinlema, shanggoulema, fishing_choose,
     diaoyuchong, diaodaole, PlayerCtl
 )
 
@@ -29,12 +29,17 @@ def main():
     print("Tip1:请确保游戏已经进入钓鱼界面!")
     print("Tip2:本脚本默认用光所有鱼竿和鱼饵后才会补全")
     print("Tip3:如果使用过程中发现无限左键了，请把鼠标移动至屏幕左上角自动结束左键连点，然后按F6停止脚本")
+    print("请选择是自动补充神话鱼饵还是普通鱼饵(默认为神话鱼饵):")
+    print("0.普通鱼饵 1.神话鱼饵")
+    choice = input("输入后Enter确认:")
+    fishing_choose(choice)
     print("接下来按F6键开始脚本把~,记得长按F6键是停止脚本！")
     # print(f"{g_current_dir}")
     while True:
         if keyboard.is_pressed('F6'):
             print("脚本开始运行")
             break
+        time.sleep(0.05)
     
     switch_to_window_by_title("星痕共鸣")
     global clicker

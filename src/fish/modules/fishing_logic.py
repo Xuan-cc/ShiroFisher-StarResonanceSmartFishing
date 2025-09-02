@@ -7,6 +7,16 @@ import os
 from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,g_current_dir,switch_to_window_by_title
 from .player_control import PlayerCtl
 from fish.modules.utils import precise_sleep
+
+g_yuer_type = 1 # 1为默认贵的，0为便宜的
+
+def fishing_choose(idx):
+    "用于给外部修改默认鱼饵类型"
+    if idx == 0:
+        g_yuer_type = idx
+    else:
+        g_yuer_type = 1
+
 class PreciseMouseClicker:
     def __init__(self, interval_ms=60, button='left', duration_ms=0):
         self.interval_ms = interval_ms
@@ -140,7 +150,10 @@ def purchase(sth):
     if sth == 'gan':
         searchandmovetoclick("shop_gan.png")
     elif sth == 'er':
-        searchandmovetoclick("shop_er.png")
+        if g_yuer_type:
+            searchandmovetoclick("shop_er.png")
+        else:
+            searchandmovetoclick("shop_er_cheap.png")
     searchandmovetoclick("shop_num.png")
     searchandmovetoclick("shop_2.png")
     searchandmovetoclick("shop_0.png")
