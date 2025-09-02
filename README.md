@@ -1,0 +1,2 @@
+# ShiroFisher-StarResonanceSmartFishing
+星痕共鸣钓鱼jio本，Python控制台项目，基于opencv+pyautogui
