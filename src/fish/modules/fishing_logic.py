@@ -4,16 +4,15 @@ import time
 import threading
 import numpy as np
 import os
-from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,g_current_dir,switch_to_window_by_title
-from .player_control import PlayerCtl
-from fish.modules.utils import precise_sleep
+from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,switch_to_window_by_title,searchandmovetoclick
+from .player_control import PlayerCtl,precise_sleep
 
 g_yuer_type = 1 # 1为默认贵的，0为便宜的
 
 def fishing_choose(idx):
     "用于给外部修改默认鱼饵类型"
-    if idx == 0:
-        g_yuer_type = idx
+    if idx == "0":
+        g_yuer_type = 0
     else:
         g_yuer_type = 1
 
@@ -96,11 +95,11 @@ class PreciseMouseClicker:
             pass
 
 def find_game_window(screenshot_cv):
-    image_path = os.path.join(g_current_dir, "esc.png")
+    image_path = full_imagePath("esc.png")
     logoinfo = find_pic(screenshot_cv, image_path, confidence = 0.8,type="A")
     print(f"已找到logoinfo为:{logoinfo}")
 
-    image_path = os.path.join(g_current_dir, "rightdown.png")
+    image_path = full_imagePath("rightdown.png")
     youxiainfo = find_pic(screenshot_cv, image_path,type="A")
     print(f"已找到youxiainfo为:{youxiainfo}")
 
@@ -121,26 +120,6 @@ def find_game_window(screenshot_cv):
 
     print(f"已找到窗口为:{windowinfo}")
     return dirinfo2pyautoguiinfo(windowinfo)
-
-def searchandmovetoclick(str,confi = 0.9):
-    window = pyautogui.screenshot()
-    window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
-    image_path = os.path.join(g_current_dir, str)
-    counter = 0
-    temp = None
-    while(temp == None):
-        temp = find_pic(window_cv, image_path, confidence = confi,type = "A")
-        counter += 1
-        if counter > 10:
-            print("searchandmovetoclick,未找到图片")
-            return 0
-    data = dirinfo2pyautoguiinfo(temp)
-    x = int(data[0] + 0.5 * data[2])
-    y = int(data[1] + 0.5 * data[3])
-    pyautogui.moveTo(x, y)
-    PlayerCtl.leftmouse(0.5)
-    precise_sleep(0.5)
-    return 1
 
 def purchase(sth):
     pyautogui.keyDown("B")
@@ -165,10 +144,10 @@ def purchase(sth):
 def youganma(yugan, yuer):
     clicker.stop_clicking()
     switch_to_window_by_title("星痕共鸣")
-    image_path = os.path.join(g_current_dir, "nogan.png")
+    image_path = full_imagePath("nogan.png")
     yuganshot = pyautogui.screenshot(region=yugan)
     yuganshot_cv = cv2.cvtColor(np.array(yuganshot), cv2.COLOR_RGB2BGR)
-    image_save_path = os.path.join(g_current_dir, "yugan_screenshot.png")
+    image_save_path = full_imagePath("yugan_screenshot.png")
     cv2.imwrite(image_save_path, yuganshot_cv)
     temp1 = find_pic(yuganshot_cv, image_path, confidence=0.8,type = "A")
     if temp1 is not None:
@@ -178,7 +157,7 @@ def youganma(yugan, yuer):
         pyautogui.keyUp("M")
         window = pyautogui.screenshot()
         window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
-        image_path = os.path.join(g_current_dir, "yong.png")
+        image_path = full_imagePath("yong.png")
         temp = find_pic(window_cv, image_path, 0.80,type = "A")
         if temp is None:
             print("❌ 鱼竿已用完，尝试买杆")
@@ -194,7 +173,7 @@ def youganma(yugan, yuer):
     print("✅ 鱼竿OK")
     yuershot = pyautogui.screenshot(region=yuer)
     yuershot_cv = cv2.cvtColor(np.array(yuershot), cv2.COLOR_RGB2BGR)
-    image_save_path = os.path.join(g_current_dir, "yuer_screenshot.png")
+    image_save_path = full_imagePath("yuer_screenshot.png")
     cv2.imwrite(image_save_path, yuganshot_cv)
     temp2 = find_pic(yuershot_cv, image_path, 0.80,type = "A")
     if temp2 is not None:
@@ -204,7 +183,7 @@ def youganma(yugan, yuer):
         pyautogui.keyUp("N")
         window = pyautogui.screenshot()
         window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
-        image_path = os.path.join(g_current_dir, "yong.png")
+        image_path = full_imagePath("yong.png")
         temp = find_pic(window_cv, image_path, 0.80,type = "A")
         if temp is None:
             print("❌ 鱼饵已用完，尝试买杆")
@@ -224,7 +203,7 @@ def jinlema(yugan):
     "检查鱼竿位置图标 在钓鱼则返回1，不在钓鱼则返回0"
     yuganshot = pyautogui.screenshot(region=yugan)
     yuganshot_cv = cv2.cvtColor(np.array(yuganshot), cv2.COLOR_RGB2BGR)
-    image_path = os.path.join(g_current_dir, "yugan_screenshot.png")
+    image_path = full_imagePath("yugan_screenshot.png")
     temp = find_pic(yuganshot_cv, image_path,0.8,type = "A")
     if temp is None:
         return 1
@@ -238,7 +217,7 @@ def shanggoulema(shanggoufind, window):
         PlayerCtl.leftmouse(0.5)
         window = pyautogui.screenshot(region=window)
         window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
-        image_path = os.path.join(g_current_dir, "diaoyuchong.png")
+        image_path = full_imagePath("diaoyuchong.png")
         temp = find_pic(window_cv, image_path, 0.5,type = "A")
         if temp is not None:
             return 1

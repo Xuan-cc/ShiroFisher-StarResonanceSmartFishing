@@ -6,18 +6,25 @@ import pygetwindow as gw
 import time
 import math
 import sys
+from fish.modules.player_control import PlayerCtl,precise_sleep 
+
 
 g_current_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-g_current_dir = os.path.join(g_current_dir, "_internal") #打包需要
-g_current_dir = os.path.join(g_current_dir, "fish")
-g_current_dir = os.path.join(g_current_dir, "modules")
-g_current_dir = os.path.join(g_current_dir, "pic")
+def full_imagePath(str):
+    "输入图片名称，返回绝对路径"
+    return os.path.join(g_current_dir, str)
+# g_current_dir = full_imagePath("_internal") #打包需要
+g_current_dir = full_imagePath("fish")
+g_current_dir = full_imagePath("modules")
+g_current_dir = full_imagePath("pic")
 # print(f"{g_current_dir}")
 global g_suofang 
 g_suofang = 1.0
 global g_suofang_ratio
 g_suofang_ratio = 1.0
 
+def get_suofang():
+    return g_suofang
 def multi_scale_template_match(template_path, screenshot=None, region=None, 
                               scale_range=(0.5, 2.0), scale_steps=10, 
                               method=cv2.TM_CCOEFF_NORMED, threshold=0.8):
@@ -190,10 +197,51 @@ def switch_to_window_by_title(window_title):
     except Exception as e:
         print(f"切换窗口时出错: {e}")
         return False
-
-def find_game_window(screenshot_cv):
+def fuben_find_game_window(screenshot_cv):
     """
-    使用模板匹配在屏幕上寻找游戏窗口,并寻找鱼竿相关信息串口
+    使用模板匹配在屏幕上寻找游戏窗口,并寻找相关信息串口
+    
+    参数:
+        screenshot_cv:CV格式的游戏窗口
+    返回:
+        window_info_ret or None: 包含窗口坐标和尺寸的字典，未找到返回None
+    """
+    # image_path = full_imagePath("jixiankongjian.png")
+    image_path = full_imagePath("ESC_Down.png")
+    multi_scale_template_match(image_path,screenshot_cv,
+                               scale_range=(0.5, 2.0),
+                               scale_steps=10,
+                               threshold=0.5)
+    # image_path = full_imagePath("jixiankongjian.png")
+    image_path = full_imagePath("ESC_Down.png")
+    logoinfo = find_pic(screenshot_cv,image_path,0.5,type = "A")
+
+    if(logoinfo == None):
+        return None
+    width = int(1920 * g_suofang)
+    height = int(1080 * width / 1920)
+    left = logoinfo.get("left") - int(1815 * g_suofang)
+    top = logoinfo.get("top") - int(1018 * width / 1920)
+    # left = logoinfo.get("left") - int(43 * g_suofang)
+    # top = logoinfo.get("top") - int(31 * width / 1920)
+    top_left = (left,top)
+    bottom_right = (top_left[0] + width, top_left[1] + height)
+
+    windowinfo = {
+        'left': top_left[0],
+        'top': top_left[1],
+        'width': width,
+        'height': height,
+    }
+    print(f"已找到窗口为:{windowinfo}")
+    
+    # 返回pyautogui能够用的格式
+    windowinfo_ret = dirinfo2pyautoguiinfo(windowinfo)
+    return windowinfo_ret
+
+def fish_find_game_window(screenshot_cv):
+    """
+    使用模板匹配在屏幕上寻找游戏窗口,并寻找鱼竿相关信息窗口
     
     参数:
         screenshot_cv:CV格式的游戏窗口
@@ -201,17 +249,17 @@ def find_game_window(screenshot_cv):
         window_info_ret or None: 包含窗口坐标和尺寸的字典，未找到返回None
     """
     
-    image_path = os.path.join(g_current_dir, "esc.png")
+    image_path = full_imagePath("esc.png")
     multi_scale_template_match(image_path,screenshot_cv,
                                scale_range=(0.5, 2.0),
                                scale_steps=10,
                                threshold=0.5)
     
-    image_path = os.path.join(g_current_dir, "esc.png")
+    image_path = full_imagePath("esc.png")
     logoinfo = find_pic(screenshot_cv,image_path,0.3,type = "A")
     # print(f"已找到logoinfo为:{logoinfo}")
 
-    # image_path = os.path.join(g_current_dir, "rightdown.png")
+    # image_path = full_imagePath("rightdown.png")
     # youxiainfo= find_pic(screenshot_cv,image_path,0.3,type = "A")
     # print(f"已找到youxiainfo为:{youxiainfo}")
 
@@ -249,6 +297,24 @@ def find_game_window(screenshot_cv):
     windowinfo_ret = dirinfo2pyautoguiinfo(windowinfo)
     return windowinfo_ret
 
+def find_game_window(screenshot_cv,funcName):
+    """
+    使用模板匹配在屏幕上寻找游戏窗口
+    参数:
+        screenshot_cv:CV格式的游戏窗口
+        funcName:函数名 可选项"fish"或"fuben"
+    返回:
+        window_info_ret or None: 包含窗口坐标和尺寸的字典，未找到返回None
+    """
+
+    if (funcName == "fish"):
+        return fish_find_game_window(screenshot_cv)
+    elif (funcName == "fuben"):
+        return fuben_find_game_window(screenshot_cv)
+    else:
+        return None
+
+
 def pyautogui2opencv(temp):
     top_left = (temp[0],temp[1])
     bottom_right = (temp[0] + temp[2],temp[1] + temp[3])
@@ -263,15 +329,63 @@ def dirinfo2pyautoguiinfo(temp):
     )
     return res
 
-import math
-import time
-
-def precise_sleep(duration):
-    (a, b) = math.modf(duration)
-    time.sleep(b)
-    target = time.perf_counter() + a
-    while time.perf_counter() < target:
-        pass
+def debug_screenshot_coordinates(image, coords_dict, save_path=None):
+    """
+    在图像上绘制坐标点并保存
+    
+    参数:
+    image: cv2格式的图像 (numpy数组)
+    coords_dict: 包含坐标的字典，格式为 {"label": (x, y), ...}
+    save_path: 保存图像的路径，如果为None则不保存
+    
+    返回:
+    绘制了坐标点的图像
+    """
+    # 创建图像的副本，以免修改原图
+    img_with_coords = image.copy()
+    
+    # 定义颜色和字体
+    point_color = (0, 0, 255)  # 红色 (BGR格式)
+    text_color = (0, 255, 0)   # 绿色 (BGR格式)
+    line_color = (255, 0, 0)   # 蓝色 (BGR格式)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.5
+    thickness = 2
+    
+    # 绘制每个坐标点
+    for label, (x, y) in coords_dict.items():
+        # 检查坐标是否在图像范围内
+        if 0 <= x < img_with_coords.shape[1] and 0 <= y < img_with_coords.shape[0]:
+            # 绘制坐标点（圆形）
+            cv2.circle(img_with_coords, (x, y), 5, point_color, -1)  # -1表示填充圆
+            
+            # 绘制坐标文本
+            text = f"{label}: ({x}, {y})"
+            cv2.putText(img_with_coords, text, (x + 10, y - 10), font, font_scale, text_color, thickness)
+            
+            # 从图像中心到坐标点绘制一条线（可选）
+            center_x, center_y = img_with_coords.shape[1] // 2, img_with_coords.shape[0] // 2
+            cv2.line(img_with_coords, (center_x, center_y), (x, y), line_color, 1)
+        else:
+            print(f"警告: 坐标 {label} ({x}, {y}) 超出图像范围")
+    
+    # 添加标题
+    title = f"坐标标记 (共{len(coords_dict)}个点)"
+    cv2.putText(img_with_coords, title, (10, 30), font, 0.7, (255, 255, 255), 2)
+    
+    # # 添加网格线（可选）
+    # for i in range(0, img_with_coords.shape[1], 100):  # 每100像素一条垂直线
+    #     cv2.line(img_with_coords, (i, 0), (i, img_with_coords.shape[0]), (50, 50, 50), 1)
+    # for i in range(0, img_with_coords.shape[0], 100):  # 每100像素一条水平线
+    #     cv2.line(img_with_coords, (0, i), (img_with_coords.shape[1], i), (50, 50, 50), 1)
+    
+    save_path = full_imagePath("debug_screenshot_fuben.png")
+    # 如果提供了保存路径，则保存图像
+    if save_path:
+        cv2.imwrite(save_path, img_with_coords)
+        print(f"图像已保存到: {save_path}")
+    
+    return img_with_coords
 
 def debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind):
 
@@ -292,7 +406,7 @@ def debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofi
     top_left,bot_right = pyautogui2opencv(zhanglifind)
     cv2.rectangle(screenshot_cv, top_left, bot_right, (255, 0, 0), 2)
 
-    image_save_path = os.path.join(g_current_dir, "debug_screenshot.png")
+    image_save_path = full_imagePath("debug_screenshot.png")
     cv2.imwrite(image_save_path, screenshot_cv)
 
 def area_cac(gamewindow):
@@ -345,3 +459,32 @@ def area_cac(gamewindow):
         int(0.02 * gamewindow[3]),
     )
     return yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind
+
+def press_key(key, duration=0.1):
+    """按下并保持按键一段时间"""
+    pyautogui.keyDown(key)
+    time.sleep(duration)
+    pyautogui.keyUp(key)
+
+def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
+    window = pyautogui.screenshot()
+    window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
+    image_path = full_imagePath(str)
+    counter = 0
+    temp = None
+    while(temp == None):
+        temp = find_pic(window_cv, image_path, confidence = confi,type = "A")
+        counter += 1
+        if counter > 10:
+            print("searchandmovetoclick,未找到图片")
+            return 0
+    data = dirinfo2pyautoguiinfo(temp)
+    x = int(data[0] + 0.5 * data[2])
+    y = int(data[1] + 0.5 * data[3])
+    pyautogui.moveTo(x, y)
+    PlayerCtl.leftmouse(delay)
+    precise_sleep(delay)
+    return 1
+
+def full_imagePath(str):
+    return os.path.join(g_current_dir, str)

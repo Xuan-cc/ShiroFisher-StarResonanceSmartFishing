@@ -1,7 +1,12 @@
 ﻿import pyautogui
 import math
-from fish.modules.utils import precise_sleep
-
+import time
+def precise_sleep(duration):
+    (a, b) = math.modf(duration)
+    time.sleep(b)
+    target = time.perf_counter() + a
+    while time.perf_counter() < target:
+        pass
 
 class PlayerCtl:
     def leftmouse(seconds):
