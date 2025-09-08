@@ -13,7 +13,7 @@ g_current_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 def full_imagePath(str):
     "输入图片名称，返回绝对路径"
     return os.path.join(g_current_dir, str)
-# g_current_dir = full_imagePath("_internal") #打包需要
+g_current_dir = full_imagePath("_internal") #打包需要
 g_current_dir = full_imagePath("fish")
 g_current_dir = full_imagePath("modules")
 g_current_dir = full_imagePath("pic")
@@ -408,8 +408,11 @@ def debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofi
 
     image_save_path = full_imagePath("debug_screenshot.png")
     cv2.imwrite(image_save_path, screenshot_cv)
+    cv2.imshow('匹配结果', screenshot_cv)
+    cv2.waitKey(0) # 等待按键后关闭窗口
+    cv2.destroyAllWindows()
 
-def area_cac(gamewindow):
+def fish_area_cac(gamewindow):
     yuer = (
         int(gamewindow[0] + 0.715 * gamewindow[2]),
         int(gamewindow[1] + 0.915 * gamewindow[3]),

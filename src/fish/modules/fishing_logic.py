@@ -8,12 +8,15 @@ from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imag
 from .player_control import PlayerCtl,precise_sleep
 
 g_yuer_type = 1 # 1为默认贵的，0为便宜的
-
+clicker = None
 def fishing_choose(idx):
     "用于给外部修改默认鱼饵类型"
+    global g_yuer_type  
     if idx == "0":
+        print(f"选择便宜鱼饵")
         g_yuer_type = 0
     else:
+        print("选择默认鱼饵")
         g_yuer_type = 1
 
 class PreciseMouseClicker:
@@ -275,7 +278,14 @@ def diaodaole(gamewindow):
         return 1
     return 0
 
-global clicker
-clicker = None
-if clicker is None:
-    clicker = PreciseMouseClicker(interval_ms=60, button='left', duration_ms=10)  # 初始化clicker的函数
+def get_clicker():
+    global clicker
+    return clicker
+
+def init_clicker():
+    global clicker
+    if clicker is None:
+        clicker = PreciseMouseClicker(interval_ms=60, button='left', duration_ms=10)
+
+if __name__ == "__main__":
+    init_clicker()

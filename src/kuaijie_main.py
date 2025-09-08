@@ -6,7 +6,7 @@ import pyautogui
 import time
 import numpy as np
 from fish.modules.utils import (find_game_window, switch_to_window_by_title ,
-                                 debug_screenshot_data , area_cac ,debug_screenshot_coordinates)
+                                 debug_screenshot_data , fish_area_cac ,debug_screenshot_coordinates)
 from fish.modules.kuaijie_logic import(KuaiSuZhuanZhi,init_coords_kuaijie)
 
 g_gamewindow = None
@@ -25,13 +25,25 @@ def kuaijie_key_handler(event):
 
     global g_gamewindow
     if is_ctrl_pressed and key == '0':
-        print("检测到 Ctrl+0，切换至灵魂乐手！")
+        print("检测到 Ctrl + 0，切换至灵魂乐手！")
         KuaiSuZhuanZhi(g_gamewindow, "linghunyueshou.png")
     elif is_ctrl_pressed and key == '-':
-        print("检测到 Ctrl+-，切换至冰魔导师！")
+        print("检测到 Ctrl + -，切换至冰魔导师！")
         KuaiSuZhuanZhi(g_gamewindow, "bingmodaoshi.png")
+    elif is_ctrl_pressed and key == '+':
+        print("检测到 Ctrl + -，切换至森语者！")
+        KuaiSuZhuanZhi(g_gamewindow, "senyuzhe.png")
+    elif is_ctrl_pressed and key == '=':
+        print("检测到 Ctrl + -，切换至神盾骑士！")
+        KuaiSuZhuanZhi(g_gamewindow, "shendunqishi.png")
 def kuaijie_main():
-    print("欢迎使用星痕共鸣自动副本脚本,本脚本识别16:9的游戏窗口~")
+    print("欢迎使用星痕共鸣自动换人脚本,本脚本识别16:9的游戏窗口~")
+    print("目前可用的功能为:")
+    print("Ctrl + 0 切换至灵魂乐手")
+    print("Ctrl + - 切换至冰魔导师")
+    print("Ctrl + + 切换至森语者")
+    print("Ctrl + = 切换至神盾骑士")
+    print("即将启动！")
     # print("Tip1:请确保游戏已经进入钓鱼界面!")
     # print("Tip2:本脚本默认用光所有鱼竿和鱼饵后才会补全")
     # print("Tip3:如果使用过程中发现无限Y左键了，请把鼠标移动至屏幕左上角自动结束左键连点，然后按F6停止脚本")

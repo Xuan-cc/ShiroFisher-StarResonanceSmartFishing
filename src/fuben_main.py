@@ -6,7 +6,7 @@ import pyautogui
 import time
 import numpy as np
 from fish.modules.utils import (find_game_window, switch_to_window_by_title ,
-                                 debug_screenshot_data , area_cac ,debug_screenshot_coordinates)
+                                 debug_screenshot_data , fish_area_cac ,debug_screenshot_coordinates)
 from fish.modules.fuben_logic import(dina_main_loop,get_coords)
 def fuben_select():
     "通过输入选择要打的副本，目前只有蒂娜"
@@ -51,7 +51,7 @@ def fuben_main():
                 break
         
         # 计算各个检测区域
-        yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = area_cac(gamewindow)
+        yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_area_cac(gamewindow)
         debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind)
         dir = get_coords(gamewindow[0], gamewindow[1]) # 获取坐标
         debug_screenshot_coordinates(screenshot_cv,dir)

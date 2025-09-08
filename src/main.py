@@ -27,12 +27,14 @@ def select():
     print("2. 副本脚本")
     print("3. 一键切人")
     inputindex = input("请输入选项：")
-    if(inputindex == "2"):
+    if(inputindex == "1"):
         fish.fish_main()
+    elif(inputindex == "2"):
+        fuben.fuben_main()
     elif(inputindex == "3"):
         kuaijie.kuaijie_main()
     else:
-        fuben.fuben_main()
+        fuben.fish_main()
 
     input("按 Enter 键关闭控制台...")
 if __name__ == "__main__":

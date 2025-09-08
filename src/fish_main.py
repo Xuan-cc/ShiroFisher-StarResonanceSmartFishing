@@ -6,18 +6,15 @@ import pyautogui
 import time
 import numpy as np
 from fish.modules.utils import (find_game_window, switch_to_window_by_title ,
-                                 debug_screenshot_data , area_cac)
+                                 debug_screenshot_data , fish_area_cac)
 from fish.modules.fishing_logic import (
-    PreciseMouseClicker, youganma, jinlema, shanggoulema, fishing_choose,
+    init_clicker,get_clicker, youganma, jinlema, shanggoulema, fishing_choose,
     diaoyuchong, diaodaole, PlayerCtl
 )
 
 STOP_HOUR = 8
 STOP_MINUTE = 0
 pyautogui.FAILSAFE = True
-
-global clicker
-clicker = None
 
 def should_stop():
     """检查当前时间是否达到停止时间"""
@@ -35,15 +32,14 @@ def fish_init():
     print("0.普通鱼饵 1.神话鱼饵")
     choice = input("输入后Enter确认:")
     fishing_choose(choice)
-    print("接下来按F6键开始脚本把~,记得长按F6键是停止脚本！")
+    print("接下来按F5键开始脚本把~,记得长按F6键是停止脚本！")
     # print(f"{g_current_dir}")
     while True:
-        if keyboard.is_pressed('F6'):
+        if keyboard.is_pressed('F5'):
             print("脚本开始运行")
             break
         time.sleep(0.05)
-    if clicker is None:
-       clicker = PreciseMouseClicker(interval_ms=60, button='left', duration_ms=10)  # 初始化clicker的函数
+    init_clicker()
     switch_to_window_by_title("星痕共鸣")
     
 def fish_porgress():
@@ -63,16 +59,16 @@ def fish_porgress():
             return
 
     # 计算各个检测区域
-    yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = area_cac(gamewindow)
+    yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_area_cac(gamewindow)
     
     debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind)
-    global clicker
     # 主循环
     status = 0
     fishcounter = 0
     timeout = timedelta(minutes=0, seconds=30)
     start_time = datetime.now()
     last_outdate_counter = 0
+    clicker = get_clicker()
     while True:
         if keyboard.is_pressed('F6'):
             clicker.stop_clicking()
