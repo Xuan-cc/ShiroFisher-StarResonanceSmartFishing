@@ -206,3 +206,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# private
+debug_screenshot.png
+debug_screenshot_fuben.png
+diaoyu_screenshot.png
+gamewindow_screenshot.png
