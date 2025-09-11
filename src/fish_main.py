@@ -85,9 +85,18 @@ def fish_porgress():
             print("⏰ ⚠️ 超过30秒未结束钓鱼流程，强制检查状态...")
             if last_outdate_counter > 3:
                 print("⚠️ 超过2分钟没动多半是跨日刀来了，点两下")
+
+                screenshot = pyautogui.screenshot()
+                screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+                debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind)
+                
+                pyautogui.keyDown('alt')
                 PlayerCtl.leftmouse(1)
-                pyautogui.sleep(1)
+                pyautogui.keyUp('alt')
+                pyautogui.sleep(0.5)
+                pyautogui.keyDown('alt')
                 PlayerCtl.leftmouse(1)
+                pyautogui.keyUp('alt')
             if jinlema(yugan):
                 last_outdate_counter += 1
                 start_time = datetime.now()

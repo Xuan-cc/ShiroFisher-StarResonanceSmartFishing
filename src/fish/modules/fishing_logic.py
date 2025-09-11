@@ -177,7 +177,7 @@ def youganma(yugan, yuer):
     yuershot = pyautogui.screenshot(region=yuer)
     yuershot_cv = cv2.cvtColor(np.array(yuershot), cv2.COLOR_RGB2BGR)
     image_save_path = full_imagePath("yuer_screenshot.png")
-    cv2.imwrite(image_save_path, yuganshot_cv)
+    cv2.imwrite(image_save_path, yuershot_cv)
     temp2 = find_pic(yuershot_cv, image_path, 0.80,type = "A")
     if temp2 is not None:
         print("❌ 鱼饵NOK")
@@ -207,7 +207,7 @@ def jinlema(yugan):
     yuganshot = pyautogui.screenshot(region=yugan)
     yuganshot_cv = cv2.cvtColor(np.array(yuganshot), cv2.COLOR_RGB2BGR)
     image_path = full_imagePath("yugan_screenshot.png")
-    temp = find_pic(yuganshot_cv, image_path,0.8,type = "A")
+    temp = find_pic(yuganshot_cv, image_path,0.8)
     if temp is None:
         return 1
     else:

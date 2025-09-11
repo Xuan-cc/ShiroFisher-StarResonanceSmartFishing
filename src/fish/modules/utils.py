@@ -408,9 +408,9 @@ def debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofi
 
     image_save_path = full_imagePath("debug_screenshot.png")
     cv2.imwrite(image_save_path, screenshot_cv)
-    cv2.imshow('匹配结果', screenshot_cv)
-    cv2.waitKey(0) # 等待按键后关闭窗口
-    cv2.destroyAllWindows()
+    # cv2.imshow('匹配结果', screenshot_cv)
+    # cv2.waitKey(0) # 等待按键后关闭窗口
+    # cv2.destroyAllWindows()
 
 def fish_area_cac(gamewindow):
     yuer = (
