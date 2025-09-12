@@ -41,9 +41,26 @@ def fish_init():
         time.sleep(0.05)
     init_clicker()
     switch_to_window_by_title("星痕共鸣")
-    
-def fish_porgress():
-    print("脚本运行中...")
+
+def fish_reset(zuo = None,you = None):
+    "无输入时冷启动，有输入时增加跨日重启功能"
+    # 尝试点击跨日刀问题
+    if(zuo is not None and you is not None):
+        clicker = get_clicker()
+        clicker.stop_clicking()
+        pyautogui.keyUp('A')
+        pyautogui.keyUp('D')
+        pyautogui.mouseUp(button='left')
+        pyautogui.keyDown('alt')
+        pyautogui.moveTo(zuo[0], zuo[1])
+        pyautogui.click()
+        pyautogui.keyUp('alt')
+        pyautogui.sleep(0.5)
+        pyautogui.keyDown('alt')
+        pyautogui.moveTo(you[0], you[1])
+        pyautogui.click()
+        pyautogui.keyUp('alt')
+    #重新读取窗口,保证已切换至星痕共鸣窗口再截图
     print("尝试获取钓鱼状态窗口")
     pyautogui.sleep(1)
     gamewindow = None
@@ -55,13 +72,17 @@ def fish_porgress():
         couter += 1
         if couter > 10:
             print("获取钓鱼状态窗口失败，请确保游戏已经进入钓鱼界面")
-            pyautogui.sleep(5)
-            return
-
+            return None
     # 计算各个检测区域
     yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_area_cac(gamewindow)
-    
     debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind)
+    return gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind
+    
+def fish_porgress():
+    print("脚本运行中...")
+    gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_reset()
+    while gamewindow is None:
+            return
     # 主循环
     status = 0
     fishcounter = 0
@@ -84,19 +105,11 @@ def fish_porgress():
             switch_to_window_by_title("星痕共鸣")
             print("⏰ ⚠️ 超过30秒未结束钓鱼流程，强制检查状态...")
             if last_outdate_counter > 3:
-                print("⚠️ 超过2分钟没动多半是跨日刀来了，点两下")
-
-                screenshot = pyautogui.screenshot()
-                screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
-                debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind)
-                
-                pyautogui.keyDown('alt')
-                PlayerCtl.leftmouse(1)
-                pyautogui.keyUp('alt')
-                pyautogui.sleep(0.5)
-                pyautogui.keyDown('alt')
-                PlayerCtl.leftmouse(1)
-                pyautogui.keyUp('alt')
+                print("⚠️ 超过2分钟没动多半是跨日刀来了/出大问题了，强制重启模式")
+                gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_reset(zuofind,youfind)
+                status = 0
+                start_time = datetime.now()
+                continue
             if jinlema(yugan):
                 last_outdate_counter += 1
                 start_time = datetime.now()

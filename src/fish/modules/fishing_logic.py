@@ -4,7 +4,7 @@ import time
 import threading
 import numpy as np
 import os
-from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,switch_to_window_by_title,searchandmovetoclick
+from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,switch_to_window_by_title,searchandmovetoclick,debug_screenshot_data,fish_area_cac
 from .player_control import PlayerCtl,precise_sleep
 
 g_yuer_type = 1 # 1为默认贵的，0为便宜的
@@ -143,6 +143,8 @@ def purchase(sth):
     searchandmovetoclick("shop_buy.png")
     searchandmovetoclick("shop_x.png")
     print("✅ 购买结束")
+
+
 
 def youganma(yugan, yuer):
     clicker.stop_clicking()

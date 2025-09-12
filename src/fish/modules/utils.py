@@ -13,7 +13,7 @@ g_current_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 def full_imagePath(str):
     "输入图片名称，返回绝对路径"
     return os.path.join(g_current_dir, str)
-g_current_dir = full_imagePath("_internal") #打包需要
+# g_current_dir = full_imagePath("_internal") #打包需要
 g_current_dir = full_imagePath("fish")
 g_current_dir = full_imagePath("modules")
 g_current_dir = full_imagePath("pic")
@@ -26,7 +26,7 @@ g_suofang_ratio = 1.0
 def get_suofang():
     return g_suofang
 def multi_scale_template_match(template_path, screenshot=None, region=None, 
-                              scale_range=(0.5, 2.0), scale_steps=10, 
+                              scale_range=(0.5, 4.0), scale_steps=10, 
                               method=cv2.TM_CCOEFF_NORMED, threshold=0.8):
     """
     多尺度模板匹配
@@ -209,9 +209,9 @@ def fuben_find_game_window(screenshot_cv):
     # image_path = full_imagePath("jixiankongjian.png")
     image_path = full_imagePath("ESC_Down.png")
     multi_scale_template_match(image_path,screenshot_cv,
-                               scale_range=(0.5, 2.0),
-                               scale_steps=10,
-                               threshold=0.5)
+                               scale_range=(0.5, 4.0),
+                               scale_steps=20,
+                               threshold=0.8)
     # image_path = full_imagePath("jixiankongjian.png")
     image_path = full_imagePath("ESC_Down.png")
     logoinfo = find_pic(screenshot_cv,image_path,0.5,type = "A")
@@ -421,7 +421,7 @@ def fish_area_cac(gamewindow):
     )
     
     yugan = (
-        int(gamewindow[0] + 0.86 * gamewindow[2]),
+        int(gamewindow[0] + 0.855 * gamewindow[2]),
         int(gamewindow[1] + 0.915 * gamewindow[3]),
         int(0.05 * 9 / 16 * gamewindow[2]),
         int(0.05 * gamewindow[3]),
