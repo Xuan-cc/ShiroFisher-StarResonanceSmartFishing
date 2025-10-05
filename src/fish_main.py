@@ -45,6 +45,7 @@ def fish_init():
 
 def fish_reset(press1 = None,press2 = None):
     "无输入时冷启动，有输入时增加跨日重启功能"
+    switch_to_window_by_title("星痕共鸣")
     # 尝试点击跨日刀问题
     if(press1 is not None and press2 is not None):
         SolveDaySwitch(press1,press2)
@@ -125,6 +126,8 @@ def fish_porgress():
                 PlayerCtl.leftmouse(1)
                 print("🎯 甩杆结束。")
                 status = 1
+            else:
+                logger.debug("❌ 无杆/饵，尝试购买")
         elif status == 1:
             clicker.stop_clicking()
             if jinlema(yugan):

@@ -480,16 +480,18 @@ def press_key(key, duration=0.1):
     pyautogui.keyUp(key)
 
 def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
-    window = pyautogui.screenshot()
-    window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
     image_path = full_imagePath(str)
     counter = 0
     temp = None
     while(temp == None):
+        global g_gamewindow
+        pyautogui.moveTo(g_gamewindow[0], g_gamewindow[1])
+        window = pyautogui.screenshot()
+        window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
         temp = find_pic(window_cv, image_path, confidence = confi,type = "A")
         counter += 1
         if counter > 120:
-            print("searchandmovetoclick,未找到图片")
+            print(f"searchandmovetoclick,未找到图片[{str}]")
             logger.warning("searchandmovetoclick,未找到图片【%s】",str)
             return 0
     data = dirinfo2pyautoguiinfo(temp)

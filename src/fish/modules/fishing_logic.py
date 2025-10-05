@@ -141,7 +141,7 @@ def purchase(sth):
     searchandmovetoclick("shop_num.png",trust,delay)
     searchandmovetoclick("shop_2.png",trust,delay)
     searchandmovetoclick("shop_0.png",trust,delay)
-    searchandmovetoclick("shop_2.png",trust,delay) #因为鼠标已经移上去了 会点不到，只要点个99出来就好了
+    searchandmovetoclick("shop_0.png",trust,delay)
     searchandmovetoclick("shop_OK.png",trust,delay)
     searchandmovetoclick("shop_buy.png",trust,delay)
     if sth == 'er':
@@ -196,7 +196,7 @@ def youganma(yugan, yuer):
         image_path = full_imagePath("yong.png")
         temp = find_pic(window_cv, image_path, 0.80,type = "A")
         if temp is None:
-            print("❌ 鱼饵已用完，尝试买杆")
+            print("❌ 鱼饵已用完，尝试买饵")
             purchase('er')
         else:
             data = dirinfo2pyautoguiinfo(temp)
