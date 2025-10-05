@@ -4,7 +4,7 @@ import time
 import threading
 import numpy as np
 import os
-from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,switch_to_window_by_title,searchandmovetoclick,debug_screenshot_data,fish_area_cac
+from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,switch_to_window_by_title,searchandmovetoclick,debug_screenshot_data,fish_area_cac,press_key
 from .player_control import PlayerCtl,precise_sleep
 
 g_yuer_type = 1 # 1为默认贵的，0为便宜的
@@ -125,23 +125,28 @@ def find_game_window(screenshot_cv):
     return dirinfo2pyautoguiinfo(windowinfo)
 
 def purchase(sth):
+    trust = 0.8
+    delay = 0.2
     pyautogui.keyDown("B")
     precise_sleep(0.5)
     pyautogui.keyUp("B")
-    searchandmovetoclick("shop.png")
+    searchandmovetoclick("shop.png",trust,delay)
     if sth == 'gan':
-        searchandmovetoclick("shop_gan.png")
+        searchandmovetoclick("shop_gan.png",trust,delay)
     elif sth == 'er':
         if g_yuer_type:
-            searchandmovetoclick("shop_er.png")
+            searchandmovetoclick("shop_er.png",trust,delay)
         else:
-            searchandmovetoclick("shop_er_cheap.png")
-    searchandmovetoclick("shop_num.png")
-    searchandmovetoclick("shop_2.png")
-    searchandmovetoclick("shop_0.png")
-    searchandmovetoclick("shop_OK.png")
-    searchandmovetoclick("shop_buy.png")
-    searchandmovetoclick("shop_x.png")
+            searchandmovetoclick("shop_er_cheap.png",trust,delay)
+    searchandmovetoclick("shop_num.png",trust,delay)
+    searchandmovetoclick("shop_2.png",trust,delay)
+    searchandmovetoclick("shop_0.png",trust,delay)
+    searchandmovetoclick("shop_2.png",trust,delay) #因为鼠标已经移上去了 会点不到，只要点个99出来就好了
+    searchandmovetoclick("shop_OK.png",trust,delay)
+    searchandmovetoclick("shop_buy.png",trust,delay)
+    if sth == 'er':
+        searchandmovetoclick("shop_yes.png",trust,delay)
+    searchandmovetoclick("shop_x.png",trust,delay)
     print("✅ 购买结束")
 
 
@@ -288,6 +293,31 @@ def init_clicker():
     global clicker
     if clicker is None:
         clicker = PreciseMouseClicker(interval_ms=60, button='left', duration_ms=10)
+
+def SolveDaySwitch(pos1,pos2):
+    # 清除所有按键状态
+    global clicker
+    clicker.stop_clicking()
+    pyautogui.keyUp('A')
+    pyautogui.keyUp('D')
+    pyautogui.mouseUp(button='left')
+    # 点掉跨日界面
+    pyautogui.keyDown('alt')
+    pyautogui.moveTo(pos1[0], pos1[1])
+    pyautogui.click()
+    pyautogui.keyUp('alt')
+    pyautogui.sleep(0.5)
+    pyautogui.keyDown('alt')
+    pyautogui.moveTo(pos2[0], pos2[1])
+    pyautogui.click()
+    pyautogui.keyUp('alt')
+    # 到这里位置应该已经把月卡界面点掉了
+    # 按6次ESC保证不在商店界面
+    for i in range(6): 
+        press_key('esc') 
+    # 按4次F保证重新进入钓鱼界面
+    for i in range(4):  
+        press_key('F')
 
 if __name__ == "__main__":
     init_clicker()

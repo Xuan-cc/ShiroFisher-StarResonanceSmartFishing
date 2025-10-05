@@ -7,8 +7,6 @@ import time
 import math
 import sys
 from fish.modules.player_control import PlayerCtl,precise_sleep 
-
-
 g_current_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 def full_imagePath(str):
     "输入图片名称，返回绝对路径"
@@ -17,14 +15,19 @@ def full_imagePath(str):
 g_current_dir = full_imagePath("fish")
 g_current_dir = full_imagePath("modules")
 g_current_dir = full_imagePath("pic")
+
+from fish.modules.logger import logger
 # print(f"{g_current_dir}")
 global g_suofang 
 g_suofang = 1.0
 global g_suofang_ratio
 g_suofang_ratio = 1.0
-
+global g_gamewindow
+g_gamewindow = None
 def get_suofang():
-    return g_suofang
+
+    # 定义一个名为get_suofang的函数，用于获取某个变量的值
+    return g_suofang  # 返回g_suofang变量的值
 def multi_scale_template_match(template_path, screenshot=None, region=None, 
                               scale_range=(0.5, 4.0), scale_steps=10, 
                               method=cv2.TM_CCOEFF_NORMED, threshold=0.8):
@@ -110,14 +113,17 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
         x, y = best_match_loc
         w, h = best_size
         print(f"最佳匹配: 尺度 {best_scale:.2f}, 匹配值 {best_match_val:.3f}")
+        logger.debug(f"最佳匹配: 尺度 {best_scale:.2f}, 匹配值 {best_match_val:.3f}")
         global g_suofang 
         g_suofang = best_scale
         global g_suofang_ratio
         g_suofang_ratio = best_match_val
         print(f"1920 * 1080 缩放比例: {g_suofang}")
+        logger.debug(f"1920 * 1080 缩放比例: {g_suofang}")
         return 1
     else:
         print(f"未找到匹配，最佳匹配值 {best_match_val:.3f} 低于阈值 {threshold}")
+        logger.warning(f"未找到匹配，最佳匹配值 {best_match_val:.3f} 低于阈值 {threshold}")
         return None
     
 
@@ -237,6 +243,8 @@ def fuben_find_game_window(screenshot_cv):
     
     # 返回pyautogui能够用的格式
     windowinfo_ret = dirinfo2pyautoguiinfo(windowinfo)
+    global g_gamewindow
+    g_gamewindow = windowinfo_ret
     return windowinfo_ret
 
 def fish_find_game_window(screenshot_cv):
@@ -295,6 +303,8 @@ def fish_find_game_window(screenshot_cv):
     
     # 返回pyautogui能够用的格式
     windowinfo_ret = dirinfo2pyautoguiinfo(windowinfo)
+    global g_gamewindow
+    g_gamewindow = windowinfo_ret
     return windowinfo_ret
 
 def find_game_window(screenshot_cv,funcName):
@@ -478,8 +488,9 @@ def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
     while(temp == None):
         temp = find_pic(window_cv, image_path, confidence = confi,type = "A")
         counter += 1
-        if counter > 10:
+        if counter > 120:
             print("searchandmovetoclick,未找到图片")
+            logger.warning("searchandmovetoclick,未找到图片【%s】",str)
             return 0
     data = dirinfo2pyautoguiinfo(temp)
     x = int(data[0] + 0.5 * data[2])
@@ -487,7 +498,16 @@ def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
     pyautogui.moveTo(x, y)
     PlayerCtl.leftmouse(delay)
     precise_sleep(delay)
+    logger.debug("寻找图片【%s】，点击位置是：（%f,%f）",str,x,y)
+    cac_relative_coords_log(x,y)
     return 1
 
+def cac_relative_coords_log(x,y):
+    global g_gamewindow
+    if g_gamewindow == None:
+        return None
+    x_rl = (x - g_gamewindow[0]) / g_gamewindow[2]
+    y_rl = (y - g_gamewindow[1]) / g_gamewindow[3]
+    logger.debug("相对窗口位置是：（%f,%f）",x_rl,y_rl)
 def full_imagePath(str):
     return os.path.join(g_current_dir, str)
