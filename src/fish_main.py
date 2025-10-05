@@ -121,7 +121,6 @@ def fish_porgress():
             
         if status == 0:
             clicker.stop_clicking()
-            start_time = datetime.now()
             if youganma(yugan, yuer):   
                 PlayerCtl.leftmouse(1)
                 print("🎯 甩杆结束。")
@@ -131,6 +130,8 @@ def fish_porgress():
         elif status == 1:
             clicker.stop_clicking()
             if jinlema(yugan):
+                "已进入钓鱼才算循环开始,避免其实在无限甩杆"
+                start_time = datetime.now()
                 print("✅ 已成功甩杆进入钓鱼界面。")
                 status = 2
             else:
