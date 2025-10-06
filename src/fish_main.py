@@ -9,7 +9,7 @@ from fish.modules.utils import (find_game_window, switch_to_window_by_title ,
                                  debug_screenshot_data)
 from fish.modules.fishing_logic import (
     init_clicker,get_clicker, youganma, jinlema, shanggoulema, fishing_choose,
-    diaoyuchong, diaodaole, PlayerCtl, SolveDaySwitch ,fish_area_cac
+    diaoyuchong, diaodaole,diaodaolema, PlayerCtl, SolveDaySwitch ,fish_area_cac
 )
 from fish.modules.logger import logger
 
@@ -110,8 +110,9 @@ def fish_porgress():
                 pass
             else:
                 # 不在钓鱼界面，检查是否鱼已上钩
-                if(diaodaole(gamewindow)): 
+                if(diaodaolema(jixufind)): 
                     print("🐟 检测到鱼已上钩，但超时未处理，重新检测")
+                    diaodaole()
                 else:
                     print("❌ 超时且不在钓鱼界面，也没有鱼上钩，重新启动流程")
                     logger.error("❌ 超时且不在钓鱼界面，也没有鱼上钩，重新启动流程")
@@ -151,7 +152,7 @@ def fish_porgress():
                 status = 4
         elif status == 4:
             clicker.stop_clicking()
-            if diaodaole(gamewindow):
+            if diaodaole():
                 print("✅ 鱼已收回，准备下一轮钓鱼\n\n")
                 status = 0
                 start_time = datetime.now()

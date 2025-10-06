@@ -252,7 +252,10 @@ def youma(you):
     if is_match:
         return 1
     return 0
-
+def diaodaolema(jixu):
+    target_color2 = (232, 232, 232)
+    is_match, match_ratio = fuzzy_color_match(jixu, target_color2, 5, 0.8)
+    return is_match
 def diaoyuchong(zuo, you, jixu, zhanglifind):
     pyautogui.mouseDown()
     target_color_zhang = (250, 250, 250)
@@ -271,25 +274,20 @@ def diaoyuchong(zuo, you, jixu, zhanglifind):
         pyautogui.keyDown("D")
         pyautogui.keyUp("A")
         pyautogui.mouseDown()
-    target_color2 = (232, 232, 232)
-    is_match, match_ratio = fuzzy_color_match(jixu, target_color2, 5, 0.8)
+    if(diaodaolema(jixu)):
     # print(f"是否钓上检测比率{match_ratio},张力检测比率{match_ratio_zhang}")
-    if is_match:
         clicker.stop_clicking()
         pyautogui.mouseUp()
         pyautogui.keyUp("A")
         pyautogui.keyUp("D")
         return 1
     return 0
-
-def diaodaole(gamewindow):
+def diaodaole():
     clicker.stop_clicking()
-    if(find_pic("jixudiaoyu.png",confi = 0.4)):
-        global g_jixudiaoyu
-        pyautogui.moveTo(g_jixudiaoyu[0], g_jixudiaoyu[1])
-        PlayerCtl.leftmouse(0.5)
-        return 1
-    return 0
+    global g_jixudiaoyu
+    pyautogui.moveTo(g_jixudiaoyu[0], g_jixudiaoyu[1])
+    PlayerCtl.leftmouse(0.5)
+    return 1
 
 def get_clicker():
     global clicker
