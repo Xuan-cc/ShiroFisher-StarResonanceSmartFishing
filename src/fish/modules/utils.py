@@ -119,7 +119,7 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
         global g_suofang_ratio
         g_suofang_ratio = best_match_val
         print(f"1920 * 1080 缩放比例: {g_suofang}")
-        logger.debug(f"1920 * 1080 缩放比例: {g_suofang}")
+        logger.debug(f"{1920 * g_suofang} * {1080 * g_suofang} 缩放比例: {g_suofang}")
         return 1
     else:
         print(f"未找到匹配，最佳匹配值 {best_match_val:.3f} 低于阈值 {threshold}")
@@ -421,57 +421,6 @@ def debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofi
     # cv2.imshow('匹配结果', screenshot_cv)
     # cv2.waitKey(0) # 等待按键后关闭窗口
     # cv2.destroyAllWindows()
-
-def fish_area_cac(gamewindow):
-    yuer = (
-        int(gamewindow[0] + 0.715 * gamewindow[2]),
-        int(gamewindow[1] + 0.915 * gamewindow[3]),
-        int(0.05 * 9 / 16 * gamewindow[2]),
-        int(0.05 * gamewindow[3]),
-    )
-    
-    yugan = (
-        int(gamewindow[0] + 0.855 * gamewindow[2]),
-        int(gamewindow[1] + 0.915 * gamewindow[3]),
-        int(0.05 * 9 / 16 * gamewindow[2]),
-        int(0.05 * gamewindow[3]),
-    )
-    
-    shanggoufind = (
-        int(gamewindow[0] + 0.47 * gamewindow[2]),
-        int(gamewindow[1] + 0.4 * gamewindow[3]),
-        int(0.04 * 9 / 16 * gamewindow[2]),
-        int(0.14 * gamewindow[3]),
-    )
-    
-    zuofind = (
-        int(gamewindow[0] + 0.43 * gamewindow[2]),
-        int(gamewindow[1] + 0.46 * gamewindow[3]),
-        int(0.03 * 9 / 16 * gamewindow[2]),
-        int(0.05 * gamewindow[3]),
-    )
-    
-    youfind = (
-        int(gamewindow[0] + 0.53 * gamewindow[2]),
-        int(gamewindow[1] + 0.46 * gamewindow[3]),
-        int(0.03 * 9 / 16 * gamewindow[2]),
-        int(0.05 * gamewindow[3]),
-    )
-    
-    jixufind = (
-        int(gamewindow[0] + 0.88 * gamewindow[2]),
-        int(gamewindow[1] + 0.88 * gamewindow[3]),
-        int(0.03 * 9 / 16 * gamewindow[2]),
-        int(0.03 * gamewindow[3]),
-    )
-    
-    zhanglifind = (
-        int(gamewindow[0] + 0.53 * gamewindow[2]),
-        int(gamewindow[1] + 0.822 * gamewindow[3]),
-        int(0.02 * 9 / 16 * gamewindow[2]),
-        int(0.02 * gamewindow[3]),
-    )
-    return yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind
 
 def press_key(key, duration=0.1):
     """按下并保持按键一段时间"""

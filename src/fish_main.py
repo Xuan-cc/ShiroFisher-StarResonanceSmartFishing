@@ -6,10 +6,10 @@ import pyautogui
 import time
 import numpy as np
 from fish.modules.utils import (find_game_window, switch_to_window_by_title ,
-                                 debug_screenshot_data , fish_area_cac)
+                                 debug_screenshot_data)
 from fish.modules.fishing_logic import (
     init_clicker,get_clicker, youganma, jinlema, shanggoulema, fishing_choose,
-    diaoyuchong, diaodaole, PlayerCtl, SolveDaySwitch
+    diaoyuchong, diaodaole, PlayerCtl, SolveDaySwitch ,fish_area_cac
 )
 from fish.modules.logger import logger
 

@@ -9,6 +9,9 @@ from .player_control import PlayerCtl,precise_sleep
 
 g_yuer_type = 1 # 1为默认贵的，0为便宜的
 clicker = None
+global g_jixudiaoyu
+g_jixudiaoyu = None
+
 def fishing_choose(idx):
     "用于给外部修改默认鱼饵类型"
     global g_yuer_type  
@@ -281,7 +284,10 @@ def diaoyuchong(zuo, you, jixu, zhanglifind):
 
 def diaodaole(gamewindow):
     clicker.stop_clicking()
-    if(searchandmovetoclick("jixudiaoyu.png",confi = 0.4)):
+    if(find_pic("jixudiaoyu.png",confi = 0.4)):
+        global g_jixudiaoyu
+        pyautogui.moveTo(g_jixudiaoyu[0], g_jixudiaoyu[1])
+        PlayerCtl.leftmouse(0.5)
         return 1
     return 0
 
@@ -294,6 +300,74 @@ def init_clicker():
     if clicker is None:
         clicker = PreciseMouseClicker(interval_ms=60, button='left', duration_ms=10)
 
+def fish_area_cac(gamewindow):
+    yuer = (
+        int(gamewindow[0] + 0.715 * gamewindow[2]),
+        int(gamewindow[1] + 0.915 * gamewindow[3]),
+        int(0.05 * 9 / 16 * gamewindow[2]),
+        int(0.05 * gamewindow[3]),
+    )
+    
+    yugan = (
+        int(gamewindow[0] + 0.855 * gamewindow[2]),
+        int(gamewindow[1] + 0.915 * gamewindow[3]),
+        int(0.05 * 9 / 16 * gamewindow[2]),
+        int(0.05 * gamewindow[3]),
+    )
+    
+    shanggoufind = (
+        int(gamewindow[0] + 0.47 * gamewindow[2]),
+        int(gamewindow[1] + 0.4 * gamewindow[3]),
+        int(0.04 * 9 / 16 * gamewindow[2]),
+        int(0.14 * gamewindow[3]),
+    )
+    
+    zuofind = (
+        int(gamewindow[0] + 0.43 * gamewindow[2]),
+        int(gamewindow[1] + 0.46 * gamewindow[3]),
+        int(0.03 * 9 / 16 * gamewindow[2]),
+        int(0.05 * gamewindow[3]),
+    )
+    
+    youfind = (
+        int(gamewindow[0] + 0.53 * gamewindow[2]),
+        int(gamewindow[1] + 0.46 * gamewindow[3]),
+        int(0.03 * 9 / 16 * gamewindow[2]),
+        int(0.05 * gamewindow[3]),
+    )
+    
+    jixufind = (
+        int(gamewindow[0] + 0.88 * gamewindow[2]),
+        int(gamewindow[1] + 0.88 * gamewindow[3]),
+        int(0.03 * 9 / 16 * gamewindow[2]),
+        int(0.03 * gamewindow[3]),
+    )
+    
+    zhanglifind = (
+        int(gamewindow[0] + 0.53 * gamewindow[2]),
+        int(gamewindow[1] + 0.822 * gamewindow[3]),
+        int(0.02 * 9 / 16 * gamewindow[2]),
+        int(0.02 * gamewindow[3]),
+    )
+
+    global g_jixudiaoyu
+    g_jixudiaoyu = (
+        int(gamewindow[0] + 0.829307 * gamewindow[2]),
+        int(gamewindow[1] + 0.903042 * gamewindow[3]),
+    )
+
+    return yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind
+
+def NotFindESC():
+    switch_to_window_by_title("星痕共鸣")
+    window = pyautogui.screenshot()
+    window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
+    image_path = full_imagePath("ESC.png")
+    temp = find_pic(window_cv, image_path, 0.8)
+    if temp is None:
+        return 1
+    else:
+        return 0
 def SolveDaySwitch(pos1,pos2):
     # 清除所有按键状态
     global clicker
@@ -311,13 +385,9 @@ def SolveDaySwitch(pos1,pos2):
     pyautogui.moveTo(pos2[0], pos2[1])
     pyautogui.click()
     pyautogui.keyUp('alt')
-    # 到这里位置应该已经把月卡界面点掉了
-    # 按6次ESC保证不在商店界面
-    for i in range(6): 
-        press_key('esc') 
-    # 按4次F保证重新进入钓鱼界面
-    for i in range(4):  
-        press_key('F')
-
+    # 到这里位置应该已经把月卡界面点掉了，避免在商店界面
+    while(NotFindESC()):
+        press_key('esc')
+        pyautogui.sleep(1)
 if __name__ == "__main__":
     init_clicker()
