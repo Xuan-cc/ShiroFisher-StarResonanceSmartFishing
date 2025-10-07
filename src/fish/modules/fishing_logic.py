@@ -384,8 +384,10 @@ def SolveDaySwitch(pos1,pos2):
     pyautogui.click()
     pyautogui.keyUp('alt')
     # 到这里位置应该已经把月卡界面点掉了，避免在商店界面
-    while(NotFindESC()):
+    conter = 0
+    while(NotFindESC() and conter < 5):
         press_key('esc')
         pyautogui.sleep(1)
+        counter += 1
 if __name__ == "__main__":
     init_clicker()
