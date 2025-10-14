@@ -5,8 +5,7 @@ from datetime import datetime, timedelta
 import pyautogui
 import time
 import numpy as np
-from fish.modules.utils import (find_game_window, switch_to_window_by_title ,
-                                 debug_screenshot_data , fish_area_cac ,debug_screenshot_coordinates)
+from fish.modules.utils import (find_game_window, SwitchToGame ,debug_screenshot_coordinates)
 from fish.modules.kuaijie_logic import(KuaiSuZhuanZhi,init_coords_kuaijie)
 
 g_gamewindow = None
@@ -53,7 +52,7 @@ def kuaijie_main():
         
         print("尝试获取游戏窗口")
         time.sleep(1)
-        switch_to_window_by_title("星痕共鸣")
+        SwitchToGame()
         time.sleep(1)
         global g_gamewindow
         couter = 0

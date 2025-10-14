@@ -4,22 +4,37 @@ import time
 import threading
 import numpy as np
 import os
-from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,switch_to_window_by_title,searchandmovetoclick,press_key
+from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,SwitchToGame,searchandmovetoclick,press_key
 from .player_control import PlayerCtl,precise_sleep
-
+global g_yuer_type
 g_yuer_type = 1 # 1为默认贵的，0为便宜的
 clicker = None
 global g_jixudiaoyu
 g_jixudiaoyu = None
+global FishLogicLangFlag
+FishLogicLangFlag = True
+def InitFishLogicLang(mylang):
+    global FishLogicLangFlag
+    if mylang == "zh":
+        FishLogicLangFlag = True
+    else:
+        FishLogicLangFlag = False
 
 def fishing_choose(idx):
     "用于给外部修改默认鱼饵类型"
-    global g_yuer_type  
+    global g_yuer_type
+    global FishLogicLangFlag
     if idx == "0":
-        print(f"选择便宜鱼饵")
+        if FishLogicLangFlag:
+            print(f"选择便宜鱼饵")
+        else:
+            print(f"Choose Regular bait")
         g_yuer_type = 0
     else:
-        print("选择默认鱼饵")
+        if FishLogicLangFlag:
+            print("选择默认鱼饵")
+        else:
+            print("Choose Special bait")
         g_yuer_type = 1
 
 class PreciseMouseClicker:
@@ -44,7 +59,7 @@ class PreciseMouseClicker:
         self.click_thread.daemon = True
         self.click_thread.start()
         
-        print(f"开始每 {self.interval_ms}ms 点击一次鼠标{self.button}键")
+        print(f"Starting to click {self.button} mouse button per {self.interval_ms}ms ")
         # print("按 Ctrl+C 停止点击")
     
     def stop_clicking(self):
@@ -57,7 +72,7 @@ class PreciseMouseClicker:
             self.click_thread.join(timeout=1.0)
         
         total_time = time.perf_counter() - self.start_time
-        print(f"鼠标点击已停止，共点击 {self.click_count} 次")
+        print(f"Stop Clicking，have clicked {self.click_count} times")
         # print(f"总运行时间: {total_time:.2f}秒")
         # print(f"平均点击频率: {self.click_count/total_time:.2f}次/秒")
     
@@ -103,11 +118,11 @@ class PreciseMouseClicker:
 def find_game_window(screenshot_cv):
     image_path = full_imagePath("esc.png")
     logoinfo = find_pic(screenshot_cv, image_path, confidence = 0.8,type="A")
-    print(f"已找到logoinfo为:{logoinfo}")
+    print(f"Has found logoinfo :{logoinfo}")
 
     image_path = full_imagePath("rightdown.png")
     youxiainfo = find_pic(screenshot_cv, image_path,type="A")
-    print(f"已找到youxiainfo为:{youxiainfo}")
+    print(f"Has found youxiainfo:{youxiainfo}")
 
     if logoinfo is None or youxiainfo is None:
         return None
@@ -124,7 +139,7 @@ def find_game_window(screenshot_cv):
         'height': height,
     }
 
-    print(f"已找到窗口为:{windowinfo}")
+    print(f"Has found Game window:{windowinfo}")
     return dirinfo2pyautoguiinfo(windowinfo)
 
 def purchase(sth):
@@ -150,13 +165,18 @@ def purchase(sth):
     if sth == 'er':
         searchandmovetoclick("shop_yes.png",trust,delay)
     searchandmovetoclick("shop_x.png",trust,delay)
-    print("✅ 购买结束")
+    global FishLogicLangFlag
+    if FishLogicLangFlag:
+        print("购买成功")
+    else:
+        print("Purchase Success")
 
 
 
 def youganma(yugan, yuer):
+    global FishLogicLangFlag
     clicker.stop_clicking()
-    switch_to_window_by_title("星痕共鸣")
+    SwitchToGame()
     image_path = full_imagePath("nogan.png")
     yuganshot = pyautogui.screenshot(region=yugan)
     yuganshot_cv = cv2.cvtColor(np.array(yuganshot), cv2.COLOR_RGB2BGR)
@@ -164,7 +184,10 @@ def youganma(yugan, yuer):
     cv2.imwrite(image_save_path, yuganshot_cv)
     temp1 = find_pic(yuganshot_cv, image_path, confidence=0.8,type = "A")
     if temp1 is not None:
-        print("❌ 鱼竿NOK")
+        if FishLogicLangFlag:
+            print("❌ 鱼竿NOK")
+        else:
+            print("Fishing Pole NOK")
         pyautogui.keyDown("M")
         precise_sleep(0.5)
         pyautogui.keyUp("M")
@@ -173,7 +196,10 @@ def youganma(yugan, yuer):
         image_path = full_imagePath("yong.png")
         temp = find_pic(window_cv, image_path, 0.80,type = "A")
         if temp is None:
-            print("❌ 鱼竿已用完，尝试买杆")
+            if FishLogicLangFlag:
+                print("❌ 鱼竿已用完，尝试买杆")
+            else:
+                print("No Fishing Pole,try to buy")
             purchase('gan')
         else:
             data = dirinfo2pyautoguiinfo(temp)
@@ -183,14 +209,20 @@ def youganma(yugan, yuer):
             PlayerCtl.leftmouse(0.5)
             precise_sleep(0.5)
         return 0
-    print("✅ 鱼竿OK")
+    if FishLogicLangFlag:
+        print("✅ 鱼竿OK")
+    else:
+        print("Fishing Pole OK")
     yuershot = pyautogui.screenshot(region=yuer)
     yuershot_cv = cv2.cvtColor(np.array(yuershot), cv2.COLOR_RGB2BGR)
     image_save_path = full_imagePath("yuer_screenshot.png")
     cv2.imwrite(image_save_path, yuershot_cv)
     temp2 = find_pic(yuershot_cv, image_path, 0.80,type = "A")
     if temp2 is not None:
-        print("❌ 鱼饵NOK")
+        if FishLogicLangFlag:
+            print("❌ 鱼饵NOK")
+        else:
+            print("Bait NOK")
         pyautogui.keyDown("N")
         precise_sleep(0.5)
         pyautogui.keyUp("N")
@@ -199,7 +231,10 @@ def youganma(yugan, yuer):
         image_path = full_imagePath("yong.png")
         temp = find_pic(window_cv, image_path, 0.80,type = "A")
         if temp is None:
-            print("❌ 鱼饵已用完，尝试买饵")
+            if FishLogicLangFlag:
+                print("❌ 鱼饵已用完，尝试买饵")
+            else:
+                print("No Bait,try to buy")
             purchase('er')
         else:
             data = dirinfo2pyautoguiinfo(temp)
@@ -209,7 +244,10 @@ def youganma(yugan, yuer):
             PlayerCtl.leftmouse(0.5)
             precise_sleep(0.5)
         return 0
-    print("✅ 鱼饵OK")
+    if FishLogicLangFlag:
+        print("✅ 鱼饵OK")
+    else:
+        print("Bait OK")
     return 1
 
 def jinlema(yugan):
@@ -261,7 +299,7 @@ def diaoyuchong(zuo, you, jixu, zhanglifind):
     target_color_zhang = (250, 250, 250)
     zhangli, match_ratio_zhang = fuzzy_color_match(zhanglifind, target_color_zhang, 30, 0.5)
     if zhangli:
-        print("正在抖杆~")
+        print("SHAKING~")
         clicker.start_clicking()
     else:
         clicker.stop_clicking()
@@ -357,7 +395,7 @@ def fish_area_cac(gamewindow):
     return yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind
 
 def NotFindESC():
-    switch_to_window_by_title("星痕共鸣")
+    SwitchToGame()
     window = pyautogui.screenshot()
     window_cv = cv2.cvtColor(np.array(window), cv2.COLOR_RGB2BGR)
     image_path = full_imagePath("ESC.png")

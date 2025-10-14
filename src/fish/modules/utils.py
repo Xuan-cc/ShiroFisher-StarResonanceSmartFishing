@@ -7,11 +7,12 @@ import time
 import math
 import sys
 from fish.modules.player_control import PlayerCtl,precise_sleep 
+from fish.modules.locate import GetSysLang
 g_current_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 def full_imagePath(str):
     "输入图片名称，返回绝对路径"
     return os.path.join(g_current_dir, str)
-# g_current_dir = full_imagePath("_internal") #打包需要
+# g_current_dir = full_imagePath("_internal") #打包需要 Package requirement
 g_current_dir = full_imagePath("fish")
 g_current_dir = full_imagePath("modules")
 g_current_dir = full_imagePath("pic")
@@ -28,6 +29,18 @@ def get_suofang():
 
     # 定义一个名为get_suofang的函数，用于获取某个变量的值
     return g_suofang  # 返回g_suofang变量的值
+global UnitLangFlag
+UnitLangFlag = True #True:中文 False:English
+def InitUnitLang(mylang):
+    global UnitLangFlag
+    if mylang == "zh":
+        UnitLangFlag = True
+    else:
+        UnitLangFlag = False
+    global g_current_dir
+    g_current_dir = full_imagePath(mylang)
+    print(f"InitUnitLang {g_current_dir}")
+
 def multi_scale_template_match(template_path, screenshot=None, region=None, 
                               scale_range=(0.5, 4.0), scale_steps=10, 
                               method=cv2.TM_CCOEFF_NORMED, threshold=0.8):
@@ -49,7 +62,7 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
     # 读取模板图像
     template = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
     if template is None:
-        raise ValueError(f"无法读取模板图像: {template_path}")
+        raise ValueError(f"cannot read template image from path: {template_path}")
     
     # 获取屏幕截图
     if screenshot is None:
@@ -106,31 +119,31 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
             best_scale = scale
             best_size = (w_resized, h_resized)
         
-        print(f"尺度 {scale:.2f}: 匹配值 {match_val:.3f}")
+        print(f"scale 尺度 {scale:.2f}: match_val 匹配值 {match_val:.3f}")
     
     # 检查是否找到匹配
     if best_match_val >= threshold:
         x, y = best_match_loc
         w, h = best_size
-        print(f"最佳匹配: 尺度 {best_scale:.2f}, 匹配值 {best_match_val:.3f}")
-        logger.debug(f"最佳匹配: 尺度 {best_scale:.2f}, 匹配值 {best_match_val:.3f}")
+        print(f"best_Matched 最佳匹配: best_scale尺度 {best_scale:.2f},match_val 匹配值 {best_match_val:.3f}")
+        logger.debug(f"best_Matched 最佳匹配: best_scale尺度 {best_scale:.2f},match_val 匹配值 {best_match_val:.3f}")
         global g_suofang 
         g_suofang = best_scale
         global g_suofang_ratio
         g_suofang_ratio = best_match_val
-        print(f"1920 * 1080 缩放比例: {g_suofang}")
-        logger.debug(f"{1920 * g_suofang} * {1080 * g_suofang} 缩放比例: {g_suofang}")
+        print(f"1920 * 1080 scale ratio 缩放比例: {g_suofang}")
+        logger.debug(f"{1920 * g_suofang} * {1080 * g_suofang} cale ratio 缩放比例 : {g_suofang}")
         return 1
     else:
-        print(f"未找到匹配，最佳匹配值 {best_match_val:.3f} 低于阈值 {threshold}")
-        logger.warning(f"未找到匹配，最佳匹配值 {best_match_val:.3f} 低于阈值 {threshold}")
+        print(f"can't find matched 未找到匹配，best_match_val 最佳匹配值 {best_match_val:.3f} lower than threshold低于阈值 {threshold}")
+        logger.warning(f"can't find matched 未找到匹配，best_match_val 最佳匹配值 {best_match_val:.3f} lower than threshold低于阈值 {threshold}")
         return None
     
 
 def find_pic(screenshot_cv, template_path, confidence=0.4 , type = None):
     template = cv2.imread(template_path)
     if template is None:
-        print(f"错误：无法读取模板图片 {template_path}")
+        print(f"cannot read template image from path {template_path}")
         return None
     template_height, template_width = template.shape[:2]
     if (type == "A"):
@@ -185,6 +198,19 @@ def fuzzy_color_match(region, target_color, tolerance=10, match_threshold=0.7):
     match_ratio = np.sum(matches) / matches.size
     is_match = match_ratio >= match_threshold
     return is_match, match_ratio
+def SwitchToGame():
+    if GetSysLang() == 'zh':
+        window_title = "星痕共鸣"
+        if switch_to_window_by_title(window_title):
+            print(f"已切换到窗口: {window_title}")
+        else:
+            print(f"未找到标题包含 '{window_title}' 的窗口")
+    else:
+        window_title = "Blue Protocol"
+        if switch_to_window_by_title(window_title):
+            print(f"Successfully switched to window: {window_title}")
+        else:
+            print(f"Canot find window with title containing'{window_title}' 的窗口")
 
 def switch_to_window_by_title(window_title):
     try:
@@ -195,13 +221,13 @@ def switch_to_window_by_title(window_title):
                 target_window.restore()
             target_window.activate()
             pyautogui.sleep(0.5)
-            print(f"已切换到窗口: {window_title}")
+            #print(f"已切换到窗口: {window_title}")
             return True
         else:
-            print(f"未找到标题包含 '{window_title}' 的窗口")
+            #print(f"未找到标题包含 '{window_title}' 的窗口")
             return False
     except Exception as e:
-        print(f"切换窗口时出错: {e}")
+        #print(f"切换窗口时出错: {e}")
         return False
 def fuben_find_game_window(screenshot_cv):
     """
@@ -239,7 +265,7 @@ def fuben_find_game_window(screenshot_cv):
         'width': width,
         'height': height,
     }
-    print(f"已找到窗口为:{windowinfo}")
+    print(f"Has find window:{windowinfo}")
     
     # 返回pyautogui能够用的格式
     windowinfo_ret = dirinfo2pyautoguiinfo(windowinfo)
@@ -289,7 +315,7 @@ def fish_find_game_window(screenshot_cv):
         'height': height,
     }
 
-    print(f"已找到窗口为:{windowinfo}")
+    print(f"Has find window:{windowinfo}")
     # top_left = (window_info.left,window_info.top)
     # bottom_right = (top_left[0] + window_info.width, top_left[1] + window_info.height)
     # # 添加置信度文本
@@ -440,8 +466,8 @@ def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
         temp = find_pic(window_cv, image_path, confidence = confi,type = "A")
         counter += 1
         if counter > 120:
-            print(f"searchandmovetoclick,未找到图片[{str}]")
-            logger.warning("searchandmovetoclick,未找到图片【%s】",str)
+            print(f"searchandmovetoclick, cant find pic 未找到图片[{str}]")
+            logger.warning("searchandmovetoclick,cant find pic 未找到图片【%s】",str)
             return 0
     data = dirinfo2pyautoguiinfo(temp)
     x = int(data[0] + 0.5 * data[2])
@@ -449,7 +475,7 @@ def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
     pyautogui.moveTo(x, y)
     PlayerCtl.leftmouse(delay)
     precise_sleep(delay)
-    logger.debug("寻找图片【%s】，点击位置是：（%f,%f）",str,x,y)
+    logger.debug("Findpic 寻找图片【%s】，ClickPosIs点击位置是：（%f,%f）",str,x,y)
     cac_relative_coords_log(x,y)
     return 1
 
@@ -459,6 +485,6 @@ def cac_relative_coords_log(x,y):
         return None
     x_rl = (x - g_gamewindow[0]) / g_gamewindow[2]
     y_rl = (y - g_gamewindow[1]) / g_gamewindow[3]
-    logger.debug("相对窗口位置是：（%f,%f）",x_rl,y_rl)
+    logger.debug("RelWindowPosIs相对窗口位置是：（%f,%f）",x_rl,y_rl)
 def full_imagePath(str):
     return os.path.join(g_current_dir, str)
