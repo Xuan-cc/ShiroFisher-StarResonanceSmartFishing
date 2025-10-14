@@ -52,18 +52,18 @@ def GuideInfomation():
         fishing_choose(choice)
         print("接下来按F5键开始脚本把~,记得长按F6键是停止脚本！")
     else:
-        print("Welcome to the Star Echo Fishing Script, this script recognizes 16:9 game windows~")
+        print("Welcome to the Star Echo Fishing Script, this script recognizes 16:9 game windows~\n\n")
         print("Tip1:Please make sure the game has entered the fishing interface!")
         print("Tip2:The script will automatically replenish myth fish bait after using all fish rods and bait")
         print("Tip3:If you find that the left key is infinite," \
         "\nplease move the mouse to the upper left corner of the screen to automatically end the left key," \
         "\n and then press [F6] to stop the script")
-        print("Tip4:Ctrl + C in console can stop the script.")
+        print("Tip4:Ctrl + C in console can stop the script.\n\n\n\n")
         print("Please choose to automatically replenish myth fish bait or ordinary bait (default myth fish bait):")
-        print("0.Regular bait 1.Special bait")
+        print("0.Regular bait\n1.Special bait")
         choice = input("Enter after input:")
         fishing_choose(choice)
-        print("Next, press [F5] to start the script, remember to [hold] [F6] to stop the script!")
+        print("Next, press [F5] to start the script, \nremember to [hold] [F6] to stop the script!")
 
 def fish_init():
     InitAllLang()
