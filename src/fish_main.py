@@ -12,7 +12,7 @@ from fish.modules.fishing_logic import (
     diaoyuchong, diaodaole,diaodaolema, PlayerCtl, SolveDaySwitch ,fish_area_cac,
     InitFishLogicLang
 )
-from fish.modules.logger import logger
+from fish.modules.logger import GetLogger ,log_init
 from fish.modules.locate import GetSysLang,InitSysLang
 
 STOP_HOUR = 8
@@ -38,6 +38,7 @@ def InitAllLang():
     InitFishMainLang(mylang)
     InitUnitLang(mylang)
     InitFishLogicLang(mylang)
+    log_init()
 def GuideInfomation():
     global FishMainLangFlag
     if FishMainLangFlag:
@@ -113,6 +114,7 @@ def fish_reset(press1 = None,press2 = None):
     
 def fish_porgress():
     global FishMainLangFlag
+    logger = GetLogger()
     if FishMainLangFlag:
         print("正在钓鱼中...")
         logger.info("正在钓鱼中...")

@@ -50,9 +50,6 @@ def fuben_main():
                 pyautogui.sleep(5)
                 break
         
-        # 计算各个检测区域
-        yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_area_cac(gamewindow)
-        debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind)
         dir = get_coords(gamewindow[0], gamewindow[1]) # 获取坐标
         debug_screenshot_coordinates(screenshot_cv,dir)
         print("接下来按F12键开始脚本把~,记得长按F12键是停止脚本！")

@@ -24,7 +24,7 @@ def should_stop():
 
 def select():
     InitSysLang()
-    if GetSysLang() == 'zh':
+    if GetSysLang() == "zh":
         print("请选择要执行的操作：")
         print("1. 开始钓鱼（默认）")
         print("2. 副本脚本")
@@ -48,3 +48,4 @@ def select():
     input("按 Enter 键关闭控制台...")
 if __name__ == "__main__":
     select()
+    input("按 Enter 键关闭控制台...")

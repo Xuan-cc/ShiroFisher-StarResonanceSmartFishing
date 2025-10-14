@@ -7,6 +7,9 @@ global logger
 logger = None
 
 def log_init():
+    global logger  # 声明logger为全局变量，以便在函数外部也能访问
+    if logger is not None:
+        return
     g_log_path = full_imagePath("log.txt")
     # logging.basicConfig(
     # level=logging.INFO,  # 设置日志级别，如 DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -16,7 +19,6 @@ def log_init():
     #     # logging.StreamHandler()  # 同时输出到控制台（可选）
     # ]
     #)
-    global logger
     logger = logging.getLogger('my_app_logger')
     logger.setLevel(logging.DEBUG) #输出所有信息
     #logger.setLevel(logging.INFO)
@@ -44,6 +46,10 @@ def log_init():
     logger.addHandler(file_handler)
     # logger.addHandler(console_handler)
     logger.info("日志初始化成功")
+def GetLogger():
+    global logger
+    return logger
 
-if logger == None:
-    log_init()
+if __name__ == '__main__':
+    if logger == None:
+        log_init()

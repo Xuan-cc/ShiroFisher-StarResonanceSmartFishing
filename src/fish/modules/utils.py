@@ -17,7 +17,7 @@ g_current_dir = full_imagePath("fish")
 g_current_dir = full_imagePath("modules")
 g_current_dir = full_imagePath("pic")
 
-from fish.modules.logger import logger
+from fish.modules.logger import GetLogger
 # print(f"{g_current_dir}")
 global g_suofang 
 g_suofang = 1.0
@@ -122,6 +122,7 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
         print(f"scale 尺度 {scale:.2f}: match_val 匹配值 {match_val:.3f}")
     
     # 检查是否找到匹配
+    logger = GetLogger()
     if best_match_val >= threshold:
         x, y = best_match_loc
         w, h = best_size
@@ -455,6 +456,7 @@ def press_key(key, duration=0.1):
     pyautogui.keyUp(key)
 
 def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
+    logger = GetLogger()
     image_path = full_imagePath(str)
     counter = 0
     temp = None
@@ -480,6 +482,7 @@ def searchandmovetoclick(str,confi = 0.9, delay = 0.5):
     return 1
 
 def cac_relative_coords_log(x,y):
+    logger = GetLogger()
     global g_gamewindow
     if g_gamewindow == None:
         return None

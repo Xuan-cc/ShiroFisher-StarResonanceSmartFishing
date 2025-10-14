@@ -4,11 +4,10 @@ import locale
 g_myLang = None
 def GetSysLang():
     global g_myLang
-    # return "en" 断点用于调试en环境
+    # return "en" # 断点用于调试en环境
     return g_myLang
 
 def InitSysLang():
-    
     global g_myLang
     if g_myLang is not None:
         return
