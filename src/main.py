@@ -42,7 +42,7 @@ def select():
         print("Your computer's system language is not Chinese (CN).")
         print("Please make sure your game language is English.")
         print("Only Fishing is available.")
-        print("Start Fishing script...\n\n\n\n")
+        print("Start Fishing script...\n\n")
         fish.fish_main()
     print("Press Enter to exit...")
     input("按 Enter 键关闭控制台...")

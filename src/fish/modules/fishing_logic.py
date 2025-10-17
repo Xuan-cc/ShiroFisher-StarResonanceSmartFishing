@@ -4,8 +4,9 @@ import time
 import threading
 import numpy as np
 import os
-from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,SwitchToGame,searchandmovetoclick,press_key
+from .utils import find_pic, dirinfo2pyautoguiinfo, fuzzy_color_match ,full_imagePath,SwitchToGame,searchandmovetoclick,press_key,FindPicFromFullScreen
 from .player_control import PlayerCtl,precise_sleep
+from .logger import GetLogger
 global g_yuer_type
 g_yuer_type = 1 # 1为默认贵的，0为便宜的
 clicker = None
@@ -421,11 +422,31 @@ def SolveDaySwitch(pos1,pos2):
     pyautogui.moveTo(pos2[0], pos2[1])
     pyautogui.click()
     pyautogui.keyUp('alt')
+    #避免过快检测ESC
+    precise_sleep(2)
     # 到这里位置应该已经把月卡界面点掉了，避免在商店界面
     counter = 0
-    while(NotFindESC() and counter < 5):
-        press_key('esc')
-        pyautogui.sleep(1)
+    while(NotFindESC()):
+        SolvePurchaseStoped()
+        pyautogui.sleep(1.2)
+        if counter > 6:
+            return False
         counter += 1
+    return True
+
+def SolvePurchaseStoped():
+    trust = 0.8
+    delay = 0.2
+    if FindPicFromFullScreen(full_imagePath("shop_yes.png")):
+        searchandmovetoclick("shop_yes.png",trust,delay)
+        searchandmovetoclick("shop_x.png",trust,delay)
+    elif FindPicFromFullScreen(full_imagePath("shop_buy.png")):
+        press_key('esc')
+    elif FindPicFromFullScreen(full_imagePath("shop_OK.png")):
+        press_key('esc')
+    elif FindPicFromFullScreen(full_imagePath("shop_x.png")):
+        press_key('esc')
+    
+        
 if __name__ == "__main__":
     init_clicker()

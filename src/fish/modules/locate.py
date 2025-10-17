@@ -2,15 +2,35 @@
 import locale
 
 g_myLang = None
+def PrintText():
+    print("\n======================================")
+    if GetSysLang() == "zh":
+        print("中文模式")
+    else:
+        print("You selected English")
+    print("======================================\n")
 def GetSysLang():
     global g_myLang
-    # return "en" # 断点用于调试en环境
     return g_myLang
 
 def InitSysLang():
     global g_myLang
     if g_myLang is not None:
         return
+    print("<Please select the server language you are using(deafault is 0)>")
+    print("<请选择你使用的服务器语言(默认是0)>")
+    print("0. Auto detect (自动识别)")
+    print("1. Chinese 中文")
+    print("2. English 英文")
+    choice = input()
+    if choice == "1":
+        g_myLang = "zh"
+        return PrintText()
+    elif choice == "2":
+        g_myLang = "en"
+        return PrintText()
+    else:
+        pass
     # 方法一：通过 locale 模块获取系统默认语言设置
     try:
         lang, _ = locale.getdefaultlocale()
@@ -18,10 +38,10 @@ def InitSysLang():
             #print(f"[方法一 - locale模块] 系统默认语言: {lang}")
             if lang.startswith('zh'):
                 g_myLang = "zh"
-                return
+                return PrintText()
             elif lang.startswith('en'):
                 g_myLang = "en"
-                return
+                return PrintText()
     except Exception as e:
         print(f"locale.getdefaultlocale() Error: {e}")
 
@@ -39,14 +59,14 @@ def InitSysLang():
                 if langs and langs[0].lower() in ['zh', 'en']:
                     if langs[0].lower() == 'zh':
                         g_myLang = "zh"
-                        return
+                        return PrintText()
                     elif langs[0].lower() == 'en':
                         g_myLang = "en"
-                        return
+                        return PrintText()
 
     # 如果无法明确判断，默认返回英文或其他提示
     g_myLang = "en"
-    return
+    return PrintText()
 
 # 调用函数并打印结果
 if __name__ == "__main__":

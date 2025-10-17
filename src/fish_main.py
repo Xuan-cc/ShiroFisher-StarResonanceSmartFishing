@@ -6,7 +6,7 @@ import pyautogui
 import time
 import numpy as np
 from fish.modules.utils import (find_game_window, SwitchToGame, InitUnitLang,
-                                 debug_screenshot_data)
+                                 debug_screenshot_data,full_imagePath)
 from fish.modules.fishing_logic import (
     init_clicker,get_clicker, youganma, jinlema, shanggoulema, fishing_choose,
     diaoyuchong, diaodaole,diaodaolema, PlayerCtl, SolveDaySwitch ,fish_area_cac,
@@ -52,14 +52,14 @@ def GuideInfomation():
         fishing_choose(choice)
         print("接下来按F5键开始脚本把~,记得长按F6键是停止脚本！")
     else:
-        print("Welcome to the Star Echo Fishing Script, this script recognizes 16:9 game windows~\n\n")
+        print("\n\nWelcome to the Star Echo Fishing Script, this script recognizes 16:9 game windows~\n")
         print("Tip1:Please make sure the game has entered the fishing interface!")
         print("Tip2:The script will automatically replenish myth fish bait after using all fish rods and bait")
         print("Tip3:If you find that the left key is infinite," \
         "\nplease move the mouse to the upper left corner of the screen to automatically end the left key," \
         "\n and then press [F6] to stop the script")
-        print("Tip4:Ctrl + C in console can stop the script.\n\n\n\n")
-        print("Please choose to automatically replenish myth fish bait or ordinary bait (default myth fish bait):")
+        print("Tip4:Ctrl + C in console can stop the script.\n\n")
+        print("Please choose to automatically replenish Special fish bait or Regular bait (default Special fish bait):")
         print("0.Regular bait\n1.Special bait")
         choice = input("Enter after input:")
         fishing_choose(choice)
@@ -84,11 +84,35 @@ def fish_init():
 def fish_reset(press1 = None,press2 = None):
     "无输入时冷启动，有输入时增加跨日重启功能"
     SwitchToGame()
+    global FishMainLangFlag
     # 尝试点击跨日刀问题
     if(press1 is not None and press2 is not None):
-        SolveDaySwitch(press1,press2)
+        resetCounter = 0
+        while(resetCounter < 3):
+            if SolveDaySwitch(press1,press2):
+                break
+            resetCounter += 1
+        if resetCounter < 3:
+            pass
+        else:
+            logger = GetLogger()
+            stopScreenshot = pyautogui.screenshot()
+            stopScreenshot_cv = cv2.cvtColor(np.array(stopScreenshot), cv2.COLOR_RGB2BGR)
+            image_save_path = full_imagePath("debug_screenshot_stop.png")
+            cv2.imwrite(image_save_path, stopScreenshot_cv)
+            if FishMainLangFlag:
+                print("已无法重置回正常MiniGame界面,强制停止脚本\n")
+                logger.critical("已无法重置回正常MiniGame界面,强制停止脚本\n")
+                print(f"debug截图已保存在{image_save_path}\n")
+                logger.critical(f"debug截图已保存在{image_save_path}\n")
+            else:
+                print("Unable to reset to normal MiniGame interface, force stop script\n")
+                logger.critical("Unable to reset to normal MiniGame interface, force stop script\n")
+                print(f"Debug screenshot has been saved to {image_save_path}\n")
+                logger.critical(f"Debug screenshot has been saved to {image_save_path}\n")
+            return False,press1,press1,press1,press1,press1,press1,press1,press1
     #重新读取窗口,保证已切换至星痕共鸣窗口再截图
-    global FishMainLangFlag
+
     if FishMainLangFlag:
         print("尝试获取钓鱼状态窗口")
     else:
@@ -110,7 +134,7 @@ def fish_reset(press1 = None,press2 = None):
     # 计算各个检测区域
     yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_area_cac(gamewindow)
     debug_screenshot_data(screenshot_cv,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind)
-    return gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind
+    return True,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind
     
 def fish_porgress():
     global FishMainLangFlag
@@ -121,7 +145,7 @@ def fish_porgress():
     else:
         print("Fishing in progress...")
         logger.info("Fishing in progress...")
-    gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_reset()
+    restetFlag,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_reset()
     while gamewindow is None:
             return
     # 主循环
@@ -156,17 +180,26 @@ def fish_porgress():
             else:
                 print("⏰ ⚠️ More than 30 seconds have passed without ending the fishing process, force check status...")
                 logger.debug("⏰ ⚠️ More than 30 seconds have passed without ending the fishing process, force check status...")
-            if last_outdate_counter > 3:
+            if last_outdate_counter >= 3:
                 if FishMainLangFlag:
-                    print("⚠️ 超过3分钟没动多半是跨日刀来了/出大问题了，强制重启模式")
-                    logger.critical("⚠️ 超过3分钟没动多半是跨日刀来了/出大问题了，强制重启模式")
+                    print("⚠️ 超过90秒没动多半是跨日刀来了/出大问题了，强制重启模式")
+                    logger.critical("⚠️ 超过90秒没动多半是跨日刀来了/出大问题了，强制重启模式")
                 else:
-                    print("⚠️ More than 3 minutes have passed without moving, most likely the cross-day knife has come or there is a big problem, force restart mode")
-                    logger.critical("⚠️ More than 3 minutes have passed without moving, most likely the cross-day knife has come or there is a big problem, force restart mode")
-                gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_reset(jixufind,shanggoufind)
-                status = 0
-                start_time = datetime.now()
-                continue
+                    print("⚠️ More than 90 seconds have passed without moving, most likely the Monthly Pass has come or there is a big problem, force restart mode")
+                    logger.critical("⚠️ More than 90 seconds have passed without moving, most likely the Monthly Pass has come or there is a big problem, force restart mode")
+                restetFlag,gamewindow,yuer,yugan,shanggoufind,zuofind,youfind,jixufind,zhanglifind = fish_reset(jixufind,shanggoufind)
+                if restetFlag:
+                    status = 0
+                    start_time = datetime.now()
+                    continue
+                else:
+                    if FishMainLangFlag:
+                        print("⚠️ 无法恢复至钓鱼界面，停止脚本")
+                        return print(f"✅ 脚本已停止，本次共钓上{fishcounter}条鱼")
+                    else:
+                        print("⚠️ Cant restore to fishing interface, stop script")
+                        return print(f"✅ The script has been stopped,\n{fishcounter} fish have been caught this time")
+
             if jinlema(yugan):
                 start_time = datetime.now()
                 if FishMainLangFlag:

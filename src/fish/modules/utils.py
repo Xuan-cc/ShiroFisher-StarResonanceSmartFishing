@@ -177,6 +177,15 @@ def find_pic(screenshot_cv, template_path, confidence=0.4 , type = None):
         # print(f"未找到图片。最高匹配度 {max_val} 低于阈值 {confidence}")
         return None
 
+def FindPicFromFullScreen(template_path, confidence=0.8, type = None):
+    screenshot = pyautogui.screenshot()
+    screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+    temp = find_pic(screenshot_cv, template_path, confidence, type)
+    if temp is not None:
+        return True
+    else:
+        return False
+
 def pyautogui2opencv(temp):
     top_left = (temp[0], temp[1])
     bottom_right = (temp[0] + temp[2], temp[1] + temp[3])
