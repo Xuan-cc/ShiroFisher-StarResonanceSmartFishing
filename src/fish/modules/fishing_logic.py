@@ -172,8 +172,6 @@ def purchase(sth):
     else:
         print("Purchase Success")
 
-
-
 def youganma(yugan, yuer):
     global FishLogicLangFlag
     clicker.stop_clicking()
@@ -261,7 +259,7 @@ def jinlema(yugan):
         return 1
     else:
         return 0
-    
+
 def shanggoulema(shanggoufind, window):
     target_color = (251, 177, 22)
     is_match, match_ratio = fuzzy_color_match(shanggoufind, target_color, 30, 0.2)
@@ -294,6 +292,7 @@ def youma(you):
 def diaodaolema(jixu):
     target_color2 = (232, 232, 232)
     is_match, match_ratio = fuzzy_color_match(jixu, target_color2, 5, 0.8)
+    # print(f"当前是否钓上检测比率{match_ratio}")
     return is_match
 def diaoyuchong(zuo, you, jixu, zhanglifind):
     pyautogui.mouseDown()
@@ -374,10 +373,10 @@ def fish_area_cac(gamewindow):
     )
     
     jixufind = (
-        int(gamewindow[0] + 0.88 * gamewindow[2]),
+        int(gamewindow[0] + 0.892 * gamewindow[2]),
         int(gamewindow[1] + 0.88 * gamewindow[3]),
-        int(0.03 * 9 / 16 * gamewindow[2]),
-        int(0.03 * gamewindow[3]),
+        int(0.02 * 9 / 16 * gamewindow[2]),
+        int(0.02 * gamewindow[3]),
     )
     
     zhanglifind = (
@@ -414,7 +413,7 @@ def SolveDaySwitch(pos1,pos2):
     pyautogui.mouseUp(button='left')
     # 点掉跨日界面
     pyautogui.keyDown('alt')
-    pyautogui.moveTo(pos1[0], pos1[1])
+    pyautogui.moveTo(g_jixudiaoyu[0], g_jixudiaoyu[1])
     pyautogui.click()
     pyautogui.keyUp('alt')
     pyautogui.sleep(0.5)
