@@ -42,7 +42,7 @@ def InitUnitLang(mylang):
     print(f"InitUnitLang {g_current_dir}")
 
 def multi_scale_template_match(template_path, screenshot=None, region=None, 
-                              scale_range=(0.5, 4.0), scale_steps=10, 
+                              scale_range=(0.5, 4.5), scale_steps=20, 
                               method=cv2.TM_CCOEFF_NORMED, threshold=0.8):
     """
     多尺度模板匹配
@@ -51,8 +51,8 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
         template_path: 模板图像路径
         screenshot: 屏幕截图（可选）
         region: 屏幕区域 (x, y, width, height)（可选）
-        scale_range: 尺度搜索范围 (min_scale, max_scale)
-        scale_steps: 尺度搜索步数
+        scale_range: NA已无效,改为覆盖市面上主流的分辨率
+        scale_steps: 已无效,改为覆盖市面上主流的分辨率
         method: 模板匹配方法
         threshold: 匹配阈值
     
@@ -60,6 +60,17 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
         匹配位置 (x, y, width, height) 或 None
     """
     # 读取模板图像
+    important_scales = [
+    0.6667,   # 1280×720
+    0.7115,   # 1366×768
+    0.8333,   # 1600×900
+    1.0000,   # 1920×1080（你的基准）
+    1.3333,   # 2560×1440
+    1.7917,   # 3440×1440
+    2.0000,   # 3840×2160（4K）
+    2.6667,   # 5120×2880
+    4.0000    # 7680×4320（8K）
+    ]
     template = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
     if template is None:
         raise ValueError(f"cannot read template image from path: {template_path}")
@@ -88,7 +99,8 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
     best_scale = 1.0
     
     # 在多尺度上搜索
-    for scale in np.linspace(scale_range[0], scale_range[1], scale_steps):
+    # for scale in np.linspace(scale_range[0], scale_range[1], scale_steps):
+    for scale in important_scales:
         # 计算缩放后的模板尺寸
         w_resized = int(w_template * scale)
         h_resized = int(h_template * scale)
@@ -119,7 +131,10 @@ def multi_scale_template_match(template_path, screenshot=None, region=None,
             best_scale = scale
             best_size = (w_resized, h_resized)
         
-        print(f"scale 尺度 {scale:.2f}: match_val 匹配值 {match_val:.3f}")
+        # 打印当前尺度的匹配结果
+        scaleA = 1920 * scale
+        scaleB = 1080 * scale
+        print(f"scale 尺度 {scale:.2f} ({scaleA:.2f} * {scaleB:.2f}), match_val 匹配值 {match_val:.3f}")
     
     # 检查是否找到匹配
     logger = GetLogger()
@@ -210,11 +225,15 @@ def fuzzy_color_match(region, target_color, tolerance=10, match_threshold=0.7):
     return is_match, match_ratio
 def SwitchToGame():
     if GetSysLang() == 'zh':
-        window_title = "星痕共鸣"
-        if switch_to_window_by_title(window_title):
-            print(f"已切换到窗口: {window_title}")
+        window_title_jian = "星痕共鸣"
+        window_title_fan = "星痕共鳴"
+        if switch_to_window_by_title(window_title_jian):
+            print(f"已切换到窗口: {window_title_jian}")
         else:
-            print(f"未找到标题包含 '{window_title}' 的窗口")
+            if switch_to_window_by_title(window_title_fan):
+                print(f"已切换到窗口: {window_title_fan}")
+            else:
+                print(f"未找到标题包含 '{window_title_jian}' 或 '{window_title_fan}' 的窗口")
     else:
         window_title = "Blue Protocol"
         if switch_to_window_by_title(window_title):
@@ -253,7 +272,7 @@ def fuben_find_game_window(screenshot_cv):
     multi_scale_template_match(image_path,screenshot_cv,
                                scale_range=(0.5, 4.0),
                                scale_steps=20,
-                               threshold=0.8)
+                               threshold=0.7)
     # image_path = full_imagePath("jixiankongjian.png")
     image_path = full_imagePath("ESC_Down.png")
     logoinfo = find_pic(screenshot_cv,image_path,0.5,type = "A")
@@ -297,7 +316,7 @@ def fish_find_game_window(screenshot_cv):
     multi_scale_template_match(image_path,screenshot_cv,
                                scale_range=(0.5, 2.0),
                                scale_steps=10,
-                               threshold=0.5)
+                               threshold=0.7)
     
     image_path = full_imagePath("esc.png")
     logoinfo = find_pic(screenshot_cv,image_path,0.3,type = "A")

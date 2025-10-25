@@ -29,6 +29,7 @@ class FishMainStatus:
         self.resetFlag = True
         self.gamewindow = None
         self.FishStopFlag = False
+        self.FishPauseFlag = False
         self.yuer = None
         self.yugan = None
         self.shanggoufind = None
@@ -38,7 +39,40 @@ class FishMainStatus:
         self.zhanglifind = None
         self.status = 0
         self.fishCounter = 0
-    
+        self.lastkey = None
+        self.delayTimes = 0.06
+    def addDelayTimes(self):
+        if(self.delayTimes < 1):
+            self.delayTimes += 0.05
+            if(FishMainLangFlag):
+                print(f"循环时间加长,当前循环时间{self.delayTimes:.2f}s!")
+            else:
+                print("Delay time is extended")
+                print(f"Current delay time{self.delayTimes:.2f}s!")
+        else:
+            if(FishMainLangFlag):
+                print(f"循环时间不能太长,当前循环时间{self.delayTimes:.2f}s!")
+            else:
+                print("Delay time is too long")
+                print(f"Current delay time{self.delayTimes:.2f}s!")
+    def subDelayTimes(self):
+        if(self.delayTimes > 0.05):
+            self.delayTimes -= 0.05
+            if(FishMainLangFlag):
+                print(f"循环时间缩短,当前循环时间{self.delayTimes:.2f}s!")
+            else:
+                print("Delay time is shortened")
+                print(f"Current delay time{self.delayTimes:.2f}s!")
+        else:
+            if(FishMainLangFlag):
+                print(f"循环时间不能太短,当前循环时间{self.delayTimes:.2f}s!")
+            else:
+                print("Delay time is too short")
+                print(f"Current delay time{self.delayTimes:.2f}s!")
+    def setLastKey(self,key):
+        self.lastkey = key
+    def getLastKey(self):
+        return self.lastkey
     def addFishCounter(self):
         self.fishCounter += 1
     def addTimeOutTimes(self):
@@ -54,6 +88,10 @@ class FishMainStatus:
         self.status = data
     def stop(self):
         self.FishStopFlag = True
+    def pause(self):
+        self.FishPauseFlag = True
+    def run(self):
+        self.FishPauseFlag = False
     def reload(self):
         #重新读取窗口,保证已切换至星痕共鸣窗口再截图
         SwitchToGame()
@@ -76,6 +114,8 @@ class FishMainStatus:
                     print("Failed to get the fishing status window, please make sure the game has entered the fishing interface")
                 return False
         # 计算各个检测区域
+        self.setstatus(0)
+        self.resetTimeOutTimes()
         self.gamewindow = gamewindow
         self.yuer,self.yugan,self.shanggoufind,self.zuofind,self.youfind,self.jixufind,self.zhanglifind = fish_area_cac(gamewindow)
         debug_screenshot_data(screenshot_cv,gamewindow,self.yuer,self.yugan,self.shanggoufind,self.zuofind,self.youfind,self.jixufind,self.zhanglifind)
@@ -116,11 +156,12 @@ def GuideInfomation():
         print("Tip2:本脚本默认用光所有鱼竿和鱼饵后才会补全")
         print("Tip3:如果使用过程中发现无限左键了，请把鼠标移动至屏幕左上角自动结束左键连点，然后按F6停止脚本")
         print("Tip4:请保证你已经使用管理员模式打脚本！")
+        print("Tip5:你可以通过PageUp和PageDown来增加和减少检测时间，默认为0.06s")
         print("请选择是自动补充神话鱼饵还是普通鱼饵(默认为神话鱼饵):")
         print("0.普通鱼饵 1.神话鱼饵")
         choice = input("输入后Enter确认:")
         fishing_choose(choice)
-        print("接下来按F5键开始脚本把~,记得长按F6键是停止脚本！")
+        print("接下来按F5键开始脚本把~,记得长按F6键是暂停脚本，ESC是退出脚本！")
     else:
         print("\n\nWelcome to the Star Echo Fishing Script, this script recognizes 16:9 game windows~\n")
         print("Tip0:Please make sure you run this programme as administrator!")
@@ -128,13 +169,63 @@ def GuideInfomation():
         print("Tip2:The script will automatically replenish myth fish bait after using all fish rods and bait")
         print("Tip3:If you find that the left key is infinite," \
         "\nplease move the mouse to the upper left corner of the screen to automatically end the left key," \
-        "\n and then press [F6] to stop the script")
-        print("Tip4:Ctrl + C in console can stop the script.\n\n")
+        "\n and then press [F6] to pause the script")
+        print("Tip4:Ctrl + C in console can stop the script.")
+        print("Tip5:You can use [PageUp] and [PageDown] to increase and decrease the detection time, the default is 0.06s\n\n")
         print("Please choose to automatically replenish Special fish bait or Regular bait (default Special fish bait):")
         print("0.Regular bait\n1.Special bait")
         choice = input("Enter after input:")
         fishing_choose(choice)
-        print("Next, press [F5] to start the script, \nremember to [hold] [F6] to stop the script!")
+        print("Next, press [F5] to start the script, \nremember to [hold] [F6] to pause the script, \n [ESC] to escape the script!")
+
+def fish_CleanEvent():
+    clicker = get_clicker()
+    clicker.stop_clicking()
+    pyautogui.keyUp('A')
+    pyautogui.keyUp('D')
+    pyautogui.mouseUp(button='left')
+
+def fish_KeyboardHandler(event):
+    """按键事件处理函数"""
+    key = event.name  # 获取按键名称（如 'a', 'esc', 'up'） 
+    if key == 'page up':
+        g_FishMain.addDelayTimes()
+    elif key == 'page down':
+        g_FishMain.subDelayTimes()
+
+    if key == g_FishMain.getLastKey():
+        return
+    g_FishMain.setLastKey(key)
+    # print(f"检测到按键: {key}")
+    if event.event_type != 'down':
+        return  # 只处理按键按下事件
+
+    if key == 'f6' and g_FishMain.FishPauseFlag == False:
+        fish_CleanEvent()
+        g_FishMain.pause()
+        if FishMainLangFlag:
+            print("✅ 检测到 F6 键，暂停脚本")
+            print("按F5键继续脚本,按ESC退出脚本")
+        else:
+            print("✅ Detected F6 key, pause script")
+            print("Press [F5] to continue the script, press [ESC] to exit the script")
+    elif key == 'f5' and g_FishMain.FishPauseFlag == True:
+        if FishMainLangFlag:
+            print("检测到 F5 键，开始脚本")
+        else:
+            print("✅ Detected F5 key, start script")
+        g_FishMain.reload()
+        g_FishMain.run()
+    elif key == 'esc':
+        fish_CleanEvent()
+        if FishMainLangFlag:
+            print("检测到 ESC 键，停止脚本")
+        else:
+            print("✅ Detected ESC key, stop script")
+        g_FishMain.stop()
+
+def fish_InitKeyboard():
+    keyboard.on_press(fish_KeyboardHandler)
 
 def fish_init():
     InitAllLang()
@@ -152,19 +243,7 @@ def fish_init():
     SwitchToGame()
     fish_InitLogger()
     fish_InitClicker()
-
-def fish_KeyboardStopScript():
-    clicker = get_clicker()
-    if keyboard.is_pressed('F6'):
-        g_FishMain.stop()
-        clicker.stop_clicking()
-        pyautogui.keyUp('A')
-        pyautogui.keyUp('D')
-        pyautogui.mouseUp(button='left')
-        if FishMainLangFlag:
-            print("✅ 检测到 F6 键，停止脚本")
-        else:
-            print("✅ Detected F6 key, stop script")
+    fish_InitKeyboard()
 
 def fish_reset():
     SwitchToGame()
@@ -315,10 +394,11 @@ def fish_ProgressFishing():
 def fish_ProgressFinishied():
     clicker.stop_clicking()
     if diaodaole():
+        lag = g_FishMain.getTimeLag()
         if FishMainLangFlag:
-            print("✅ 鱼已收回，准备下一轮钓鱼\n\n")
+            print(f"✅ 鱼已收回，本轮钓鱼花费{lag}s，准备下一轮钓鱼\n\n")
         else:
-            print("✅ The fish has been reeled in, ready for the next round of fishing\n\n")
+            print(f"✅ The fish has been reeled in, this round of fishing took {lag}s, ready for the next round of fishing\n\n")
         g_FishMain.setstatus(0)
         g_FishMain.setStartTime()
         g_FishMain.resetTimeOutTimes()
@@ -332,22 +412,32 @@ g_FishFunctionDic = {
 }
 
 def fish_porgress():
+    """
+    钓鱼主函数，根据语言设置显示不同的钓鱼提示信息，并执行钓鱼主循环
+    包含超时处理、停止标志检查和状态切换等功能
+    """
     if FishMainLangFlag:
-        print("正在钓鱼中...")
-        logger.info("正在钓鱼中...")
+        print("正在钓鱼中...")  # 根据语言标志显示中文提示
+        logger.info("正在钓鱼中...")  # 记录中文日志
     else:
-        print("Fishing in progress...")
-        logger.info("Fishing in progress...")
+        print("Fishing in progress...")  # 根据语言标志显示英文提示
+        logger.info("Fishing in progress...")  # 记录英文日志
     
-    if g_FishMain.reload() is not True:
+    if g_FishMain.reload() is not True:  # 尝试重新加载，如果失败则返回
             return
-    # 主循环
-    timeout = timedelta(minutes=0, seconds=30)
-    g_FishMain.setStartTime()
-    g_FishMain.resetTimeOutTimes()
+    # 主循环 - 处理钓鱼过程中的各种状态和事件
+    timeout = timedelta(minutes=0, seconds=30)  # 设置超时时间为30秒
+    g_FishMain.setStartTime()  # 记录开始时间
+    g_FishMain.resetTimeOutTimes()  # 重置超时次数
     while True:
-        fish_KeyboardStopScript()
+        # fish_KeyboardStopScript()  # 键盘停止脚本功能（已注释）
         # 如果已经超过30秒，重置计时
+        if g_FishMain.FishStopFlag:
+            fish_StopData()
+            return
+        if g_FishMain.FishPauseFlag:
+            g_FishMain.setStartTime()
+            continue
         if g_FishMain.getTimeLag() > timeout:
             g_FishMain.setStartTime()
             SwitchToGame()
@@ -358,13 +448,9 @@ def fish_porgress():
                 g_FishMain.resetTimeOutTimes()
             g_FishMain.addTimeOutTimes()
 
-        if g_FishMain.FishStopFlag:
-            fish_StopData()
-            return
-        
         g_FishFunctionDic[g_FishMain.status]()
 
-        time.sleep(0.05)
+        time.sleep(g_FishMain.delayTimes)
 
 def fish_main():
     try:
