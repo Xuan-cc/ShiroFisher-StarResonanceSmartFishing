@@ -27,8 +27,8 @@ def select():
     if GetSysLang() == "zh":
         print("请选择要执行的操作：")
         print("1. 开始钓鱼（默认）")
-        print("2. 副本脚本")
-        print("3. 一键切人")
+        print("2. 副本脚本(已停止开发)")
+        print("3. 一键切人(仅支持简中)")
         inputindex = input("请输入选项：")
         if(inputindex == "1"):
             fish.fish_main()

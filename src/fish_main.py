@@ -13,7 +13,7 @@ from fish.modules.fishing_logic import (
     InitFishLogicLang
 )
 from fish.modules.logger import GetLogger ,log_init
-from fish.modules.locate import GetSysLang,InitSysLang
+from fish.modules.locate import GetSysLang,InitSysLang,GetCnLang
 
 STOP_HOUR = 8
 STOP_MINUTE = 0
@@ -147,7 +147,7 @@ def InitAllLang():
     mylang = GetSysLang()
     InitFishMainLang(mylang)
     InitUnitLang(mylang)
-    InitFishLogicLang(mylang)
+    InitFishLogicLang(mylang,GetCnLang())
     log_init()
 def GuideInfomation():
     if FishMainLangFlag:
@@ -155,15 +155,17 @@ def GuideInfomation():
         print("Tip1:请确保游戏已经进入钓鱼界面!")
         print("Tip2:本脚本默认用光所有鱼竿和鱼饵后才会补全")
         print("Tip3:如果使用过程中发现无限左键了，请把鼠标移动至屏幕左上角自动结束左键连点，然后按F6停止脚本")
-        print("Tip4:请保证你已经使用管理员模式打脚本！")
+        print("Tip4:请保证你已经使用管理员模式打开脚本！\n请保证你已经使用管理员模式打开脚本！\n请保证你已经使用管理员模式打开脚本！")
         print("Tip5:你可以通过PageUp和PageDown来增加和减少检测时间，默认为0.06s")
-        print("请选择是自动补充神话鱼饵还是普通鱼饵(默认为神话鱼饵):")
-        print("0.普通鱼饵 1.神话鱼饵")
+        print("请选择是自动补充特制鱼饵还是普通鱼饵(默认为特制鱼饵):")
+        print("0.普通鱼饵 普通魚餌 \n1.特制鱼饵 特質魚餌")
         choice = input("输入后Enter确认:")
         fishing_choose(choice)
         print("接下来按F5键开始脚本把~,记得长按F6键是暂停脚本，ESC是退出脚本！")
     else:
-        print("\n\nWelcome to the Star Echo Fishing Script, this script recognizes 16:9 game windows~\n")
+        print("\n\nWelcome to the Star Echo Fishing Script, this script recognizes 16:9 game windows~\n\n")
+        print("Tip0:Please make sure you run this programme as administrator!")
+        print("Tip0:Please make sure you run this programme as administrator!")
         print("Tip0:Please make sure you run this programme as administrator!")
         print("Tip1:Please make sure the game has entered the fishing interface!")
         print("Tip2:The script will automatically replenish myth fish bait after using all fish rods and bait")

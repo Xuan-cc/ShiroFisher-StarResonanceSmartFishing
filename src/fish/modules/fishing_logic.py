@@ -13,18 +13,21 @@ clicker = None
 global g_jixudiaoyu
 g_jixudiaoyu = None
 global FishLogicLangFlag
-FishLogicLangFlag = True
-def InitFishLogicLang(mylang):
+FishLogicLangFlag = True #是中文
+FishLogiCNFlag = True #是简体
+def InitFishLogicLang(mylang,cnFlag = True):
     global FishLogicLangFlag
     if mylang == "zh":
         FishLogicLangFlag = True
     else:
         FishLogicLangFlag = False
 
+    global FishLogiCNFlag
+    FishLogiCNFlag = cnFlag
+
 def fishing_choose(idx):
     "用于给外部修改默认鱼饵类型"
     global g_yuer_type
-    global FishLogicLangFlag
     if idx == "0":
         if FishLogicLangFlag:
             print(f"选择便宜鱼饵")
@@ -158,15 +161,20 @@ def purchase(sth):
         else:
             searchandmovetoclick("shop_er_cheap.png",trust,delay)
     searchandmovetoclick("shop_num.png",trust,delay)
-    searchandmovetoclick("shop_2.png",trust,delay)
+    searchandmovetoclick("shop_1.png",trust,delay)
     searchandmovetoclick("shop_0.png",trust,delay)
     searchandmovetoclick("shop_0.png",trust,delay)
     searchandmovetoclick("shop_OK.png",trust,delay)
-    searchandmovetoclick("shop_buy.png",trust,delay)
+    if FishLogiCNFlag:
+        searchandmovetoclick("shop_buy.png",trust,delay)
+    else:
+        searchandmovetoclick("shop_buy_fan.png",trust,delay)
     if sth == 'er':
-        searchandmovetoclick("shop_yes.png",trust,delay)
+        if FishLogiCNFlag:
+            searchandmovetoclick("shop_yes.png",trust,delay)
+        else:
+            searchandmovetoclick("shop_yes_fan.png",trust,delay)
     searchandmovetoclick("shop_x.png",trust,delay)
-    global FishLogicLangFlag
     if FishLogicLangFlag:
         print("购买成功")
     else:

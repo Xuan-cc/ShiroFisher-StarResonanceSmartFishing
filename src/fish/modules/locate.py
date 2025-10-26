@@ -2,10 +2,17 @@
 import locale
 
 g_myLang = None
+g_cnLang = True
+def GetCnLang():
+    return g_cnLang
 def PrintText():
     print("\n======================================")
     if GetSysLang() == "zh":
         print("中文模式")
+        if g_cnLang:
+            print("简体中文")
+        else:
+            print("繁体中文")
     else:
         print("You selected English")
     print("======================================\n")
@@ -15,18 +22,25 @@ def GetSysLang():
 
 def InitSysLang():
     global g_myLang
+    global g_cnLang
     if g_myLang is not None:
         return
     print("<Please select the server language you are using(deafault is 0)>")
     print("<请选择你使用的服务器语言(默认是0)>")
     print("0. Auto detect (自动识别)")
-    print("1. Chinese 中文")
-    print("2. English 英文")
+    print("1. Simple Chinese 简体中文")
+    print("2. Traditional Chinese 繁体中文")
+    print("3. English 英文")
+
     choice = input()
     if choice == "1":
         g_myLang = "zh"
         return PrintText()
     elif choice == "2":
+        g_myLang = "zh"
+        g_cnLang = False
+        return PrintText()
+    elif choice == "3":
         g_myLang = "en"
         return PrintText()
     else:
@@ -38,6 +52,10 @@ def InitSysLang():
             #print(f"[方法一 - locale模块] 系统默认语言: {lang}")
             if lang.startswith('zh'):
                 g_myLang = "zh"
+                if lang.startswith('zh_CN'):
+                    pass
+                else:
+                    g_cnLang = False
                 return PrintText()
             elif lang.startswith('en'):
                 g_myLang = "en"
@@ -59,6 +77,10 @@ def InitSysLang():
                 if langs and langs[0].lower() in ['zh', 'en']:
                     if langs[0].lower() == 'zh':
                         g_myLang = "zh"
+                        if langs[1].lower() == 'CN':
+                            pass
+                        else:
+                            g_cnLang = False
                         return PrintText()
                     elif langs[0].lower() == 'en':
                         g_myLang = "en"
